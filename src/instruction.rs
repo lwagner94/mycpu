@@ -1,5 +1,5 @@
 pub enum Instruction {
-    LoadImmediate(usize, u16),
+    LoadImmediate(usize, u32),
     Increment(usize),
     Decrement(usize),
     Add(usize, usize, usize),

@@ -3,8 +3,8 @@ use ::instruction::Instruction::{*};
 
 
 pub struct CPU {
-    pub pc: u16,
-    pub regs: [u16; 16]
+    pub pc: u32,
+    pub regs: [u32; 16]
 }
 
 impl CPU {
@@ -28,7 +28,7 @@ impl CPU {
             And(dest_reg, op_1, op_2) => self.regs[dest_reg] = self.regs[op_1] & self.regs[op_2],
             Or(dest_reg, op_1, op_2) => self.regs[dest_reg] = self.regs[op_1] | self.regs[op_2],
             XOr(dest_reg, op_1, op_2) => self.regs[dest_reg] = self.regs[op_1] ^ self.regs[op_2],
-            Negate(reg_nr) => self.regs[reg_nr] = (-(self.regs[reg_nr] as i32)) as u16,
+            Negate(reg_nr) => self.regs[reg_nr] = (-(self.regs[reg_nr] as i64)) as u32,
             Complement(reg_nr) => self.regs[reg_nr] = !self.regs[reg_nr]
         }
     }
@@ -136,7 +136,7 @@ mod tests {
         let mut cpu = create_cpu();
         cpu.regs[0] = 0b00000000_00000001;
         cpu.execute_instruction(Negate(0));
-        assert_eq!(cpu.regs[0], 0b11111111_11111111);
+        assert_eq!(cpu.regs[0], 0b11111111_11111111_11111111_11111111);
     }
 
     #[test]
@@ -144,7 +144,7 @@ mod tests {
         let mut cpu = create_cpu();
         cpu.regs[0] = 0b00000000_00000001;
         cpu.execute_instruction(Complement(0));
-        assert_eq!(cpu.regs[0], 0b11111111_11111110);
+        assert_eq!(cpu.regs[0], 0b11111111_11111111_11111111_11111110);
     }
 
 

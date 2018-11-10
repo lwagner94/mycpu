@@ -1,19 +1,19 @@
 struct Memory {
-    data: Vec<u16>
+    data: Vec<u32>
 }
 
 impl Memory {
-    fn read_word(self: &Self, addr: usize) -> u16 {
-        if addr % 2 != 0 {
+    fn read(self: &Self, addr: usize) -> u32 {
+        if addr % 4 != 0 {
             panic!("Unaligned memory access at {:x}!", addr);
         }
-        self.data[addr / 2]
+        self.data[addr / 4]
     }
 
-    fn write_word(self: &mut Self, addr: usize, value: u16) {
-        if addr % 2 != 0 {
+    fn write(self: &mut Self, addr: usize, value: u32) {
+        if addr % 4 != 0 {
             panic!("Unaligned memory access at {:x}!", addr);
         }
-        self.data[addr / 2] = value;
+        self.data[addr / 4] = value;
     }
 }
