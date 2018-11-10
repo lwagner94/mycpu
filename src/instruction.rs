@@ -90,7 +90,7 @@ pub struct DecodedInstruction {
 }
 
 impl DecodedInstruction {
-    fn new(instruction_type: Instruction, reg_1: u8, reg_2: u8, reg_3: u8, operand: u32) -> Self {
+    pub fn new(instruction_type: Instruction, reg_1: u8, reg_2: u8, reg_3: u8, operand: u32) -> Self {
         DecodedInstruction {
             instruction_type,
             reg_1,
@@ -151,7 +151,7 @@ impl DecodedInstruction {
 
 #[cfg(test)]
 mod tests {
-    use super::*;
+    //use super::*;
 
     #[test]
     fn test_encode() {

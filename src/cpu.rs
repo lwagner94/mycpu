@@ -1,11 +1,10 @@
 use std::num::Wrapping;
 
-use ::instruction;
-use ::instruction::Instruction;
 use ::instruction::DecodedInstruction;
 use ::instruction::Instruction::{*};
 
 use ::memory::Memory;
+
 
 #[derive(Debug)]
 pub enum Register {
@@ -36,25 +35,29 @@ pub struct CPU {
 }
 
 impl CPU {
-    fn new(mem: Memory) -> Self {
+    pub fn new(mem: Memory) -> Self {
         CPU {
             regs: [Wrapping(0u32); 19],
             memory: mem
         }
     }
 
-    pub fn get_register(self: &Self, reg: Register) -> u32 {
+    fn get_register(self: &Self, reg: Register) -> u32 {
         self.regs[reg as usize].0
     }
 
-    pub fn set_register(self: &mut Self, reg: Register, value: u32) {
+    fn set_register(self: &mut Self, reg: Register, value: u32) {
         self.regs[reg as usize] = Wrapping(value);
     }
 
-    // This temporary?
-    pub fn execute_instruction(self: &mut Self, instruction: &[u32; 2]) {
+    fn load_instruction(self: &mut Self) -> [u32; 2] {
+        let pc = self.regs[Register::PC as usize];
+        self.regs[Register::PC as usize] += Wrapping(8);
+        self.memory.read_instruction(pc.0)
+    }
 
-        let d = DecodedInstruction::decode(instruction);
+
+    fn execute_instruction(self: &mut Self, d: DecodedInstruction) {
 
         let reg_1 = d.reg_1 as usize;
         let reg_2 = d.reg_2 as usize;
@@ -81,13 +84,14 @@ impl CPU {
             Invalid => panic!("Invalid instruction {:?}", d.instruction_type)
         }
     }
+
+    pub fn run(self: &mut Self) {
+        // Init
+        let instruction = self.load_instruction();
+        let decoded_instruction = DecodedInstruction::decode(&instruction);
+        self.execute_instruction(decoded_instruction);
+    }
 }
-
-
-pub fn write_byte_to_stdout(byte: u8) {
-    print!("{}", byte as char);
-}
-
 
 #[cfg(test)]
 mod tests {
@@ -95,7 +99,7 @@ mod tests {
     use super::Register::*;
 
     fn create_cpu() -> CPU {
-        CPU::new(Memory::new())
+        CPU::new(Memory::new(1024))
     }
 
     fn cpu_arith_prep() -> CPU {
@@ -116,7 +120,7 @@ mod tests {
     #[test]
     fn test_load_immediate() {
         let mut cpu = create_cpu();
-        cpu.execute_instruction(&DecodedInstruction::encode(
+        cpu.execute_instruction(DecodedInstruction::new(
             LoadImmediate, 0, 0, 0, 1337));
         assert_eq!(cpu.get_register(R0), 1337);
     }
@@ -124,7 +128,7 @@ mod tests {
     #[test]
     fn test_increment() {
         let mut cpu = cpu_arith_prep();
-        cpu.execute_instruction(&DecodedInstruction::encode(
+        cpu.execute_instruction(DecodedInstruction::new(
             Increment, 1, 0,0,0));
         assert_eq!(cpu.get_register(R1), 11);
     }
@@ -132,7 +136,7 @@ mod tests {
     #[test]
     fn test_decrement() {
         let mut cpu = cpu_arith_prep();
-        cpu.execute_instruction(&DecodedInstruction::encode(
+        cpu.execute_instruction(DecodedInstruction::new(
             Decrement, 1, 0,0,0));
         assert_eq!(cpu.get_register(R1), 9);
     }
@@ -140,7 +144,7 @@ mod tests {
     #[test]
     fn test_add() {
         let mut cpu = cpu_arith_prep();
-        cpu.execute_instruction(&DecodedInstruction::encode(
+        cpu.execute_instruction(DecodedInstruction::new(
             Add, 0, 1,2,0));
         assert_eq!(cpu.get_register(R0), 15);
     }
@@ -148,7 +152,7 @@ mod tests {
     #[test]
     fn test_subtract() {
         let mut cpu = cpu_arith_prep();
-        cpu.execute_instruction(&DecodedInstruction::encode(
+        cpu.execute_instruction(DecodedInstruction::new(
             Subtract, 0, 1,2,0));
         assert_eq!(cpu.get_register(R0), 5);
     }
@@ -156,7 +160,7 @@ mod tests {
     #[test]
     fn test_multiply() {
         let mut cpu = cpu_arith_prep();
-        cpu.execute_instruction(&DecodedInstruction::encode(
+        cpu.execute_instruction(DecodedInstruction::new(
             Multiply, 0, 1,2,0));
         assert_eq!(cpu.get_register(R0), 50);
     }
@@ -164,7 +168,7 @@ mod tests {
     #[test]
     fn test_divide() {
         let mut cpu = cpu_arith_prep();
-        cpu.execute_instruction(&DecodedInstruction::encode(
+        cpu.execute_instruction(DecodedInstruction::new(
             Divide, 0, 1,2,0));
         assert_eq!(cpu.get_register(R0), 2);
     }
@@ -172,7 +176,7 @@ mod tests {
     #[test]
     fn test_or() {
         let mut cpu = cpu_binary_prep();
-        cpu.execute_instruction(&DecodedInstruction::encode(
+        cpu.execute_instruction(DecodedInstruction::new(
             Or, 0, 1,2,0));
         assert_eq!(cpu.get_register(R0), 0b1111);
     }
@@ -180,7 +184,7 @@ mod tests {
     #[test]
     fn test_and() {
         let mut cpu = cpu_binary_prep();
-        cpu.execute_instruction(&DecodedInstruction::encode(
+        cpu.execute_instruction(DecodedInstruction::new(
             And, 0, 1,2,0));
         assert_eq!(cpu.get_register(R0), 0b1000);
     }
@@ -188,7 +192,7 @@ mod tests {
     #[test]
     fn test_xor() {
         let mut cpu = cpu_binary_prep();
-        cpu.execute_instruction(&DecodedInstruction::encode(
+        cpu.execute_instruction(DecodedInstruction::new(
             XOr, 0, 1,2,0));
         assert_eq!(cpu.get_register(R0), 0b0111);
     }
@@ -197,7 +201,7 @@ mod tests {
     fn test_negate() {
         let mut cpu = create_cpu();
         cpu.set_register(R0, 0b00000000_00000001);
-        cpu.execute_instruction(&DecodedInstruction::encode(
+        cpu.execute_instruction(DecodedInstruction::new(
             Negate, 0, 0,0,0));
         assert_eq!(cpu.get_register(R0), 0b11111111_11111111_11111111_11111111);
     }
@@ -206,9 +210,8 @@ mod tests {
     fn test_complement() {
         let mut cpu = create_cpu();
         cpu.set_register(R0, 0b00000000_00000001);
-        cpu.execute_instruction(&DecodedInstruction::encode(
+        cpu.execute_instruction(DecodedInstruction::new(
             Complement, 0, 0,0,0));
         assert_eq!(cpu.get_register(R0), 0b11111111_11111111_11111111_11111110);
     }
 }
-

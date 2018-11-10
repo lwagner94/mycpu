@@ -1,10 +1,13 @@
+#![allow(dead_code)]
+
 mod cpu;
 mod memory;
 mod instruction;
 
-use cpu::write_byte_to_stdout;
+use cpu::CPU;
+use memory::Memory;
 
 fn main() {
-    println!("Hello, world!");
-    write_byte_to_stdout(67);
+    let memory = Memory::new(1024);
+    let mut _cpu = CPU::new(memory);
 }
