@@ -2,12 +2,13 @@
 
 mod cpu;
 mod memory;
-mod instruction;
+mod encoding;
+mod generated;
 
 use cpu::CPU;
 use memory::Memory;
-use instruction::DecodedInstruction;
-use instruction::Instruction;
+use encoding::DecodedInstruction;
+use generated::instruction::Instruction;
 
 fn main() {
     let mut memory = Memory::new(1024);

@@ -1,7 +1,7 @@
 use std::num::Wrapping;
 
-use ::instruction::DecodedInstruction;
-use ::instruction::Instruction::{*};
+use ::encoding::DecodedInstruction;
+use ::generated::instruction::Instruction::{*};
 
 use ::memory::Memory;
 

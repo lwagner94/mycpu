@@ -1,0 +1,45 @@
+- name: NOp
+  code: 0x00
+
+- name: Halt
+  code: 0x01
+
+- name: Increment
+  code: 0x10
+
+- name: Decrement
+  code: 0x11
+
+- name: Add
+  code: 0x12
+
+- name: Subtract
+  code: 0x13
+
+- name: Multiply
+  code: 0x14
+
+- name: Divide
+  code: 0x15
+
+
+- name: Or
+  code: 0x20
+
+- name: And
+  code: 0x21
+
+- name: XOr
+  code: 0x22
+
+- name: Negate
+  code: 0x23
+
+- name: Complement
+  code: 0x24
+
+- name: LoadImmediate
+  code: 0x30
+
+- name: Invalid
+  code: 0xFF
