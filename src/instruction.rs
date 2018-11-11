@@ -104,24 +104,6 @@ impl DecodedInstruction {
         }
     }
 
-    /*
-    fn no_reg(instruction_type: Instruction) -> Self {
-        Self::new(instruction_type, 0,0, 0, 0)
-    }
-
-    fn one_reg(instruction_type: Instruction, reg_1: u8) -> Self {
-        Self::new(instruction_type, reg_1,0, 0, 0)
-    }
-
-    fn three_reg(instruction_type: Instruction, reg_1: u8, reg_2: u8, reg_3: u8) -> Self {
-        Self::new(instruction_type, reg_1, reg_2, reg_3, 0)
-    }
-
-    fn one_reg_operand(instruction_type: Instruction, reg_1: u8, operand: u32) -> Self {
-        Self::new(instruction_type, reg_1, 0, 0, operand)
-    }
-    */
-
     pub fn decode(instruction: &[u32; 2]) -> DecodedInstruction {
         let mut mask = 0xFF_00_00_00u32;
         let instruction_type = Instruction::from(((instruction[0] & mask) >> 24) as u8);
