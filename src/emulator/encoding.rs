@@ -1,6 +1,7 @@
 
 
-use ::generated::instruction::Instruction;
+use super::super::common::generated::instruction::Instruction;
+
 
 pub struct DecodedInstruction {
     pub instruction_type: Instruction,

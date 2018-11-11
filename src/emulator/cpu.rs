@@ -1,9 +1,9 @@
 use std::num::Wrapping;
 
-use ::encoding::DecodedInstruction;
-use ::generated::instruction::Instruction::{*};
+use emulator::encoding::DecodedInstruction;
+use super::super::common::generated::instruction::Instruction::{*};
 
-use ::memory::Memory;
+use emulator::memory::Memory;
 
 
 #[derive(Debug)]

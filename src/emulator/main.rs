@@ -1,14 +1,11 @@
 #![allow(dead_code)]
 
-mod cpu;
-mod memory;
-mod encoding;
-mod generated;
+extern crate mycpu;
 
-use cpu::CPU;
-use memory::Memory;
-use encoding::DecodedInstruction;
-use generated::instruction::Instruction;
+use mycpu::emulator::cpu::CPU;
+use mycpu::emulator::memory::Memory;
+use mycpu::emulator::encoding::DecodedInstruction;
+use mycpu::common::generated::instruction::Instruction;
 
 fn main() {
     let mut memory = Memory::new(1024);

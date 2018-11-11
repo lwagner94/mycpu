@@ -49,7 +49,7 @@ if __name__ == "__main__":
 
     t = Template(TEMPLATE)
 
-    with open("src/emulator/generated/instruction.rs", "w") as f:
+    with open("src/common/generated/instruction.rs", "w") as f:
         f.write(t.substitute(**locals()))
 
 

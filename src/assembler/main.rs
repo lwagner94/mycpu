@@ -3,8 +3,7 @@
 extern crate regex;
 #[macro_use] extern crate failure;
 
-mod parser;
-mod tokenizer;
+extern crate mycpu;
 
 use regex::Regex;
 use std::fs::File;
@@ -12,8 +11,9 @@ use std::io::BufReader;
 use std::io::BufRead;
 use std::io::prelude::*;
 use std::env;
-
 use failure::Error;
+
+use mycpu::assembler::tokenizer;
 
 
 fn main() {
