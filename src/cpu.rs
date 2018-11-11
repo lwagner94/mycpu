@@ -31,14 +31,16 @@ pub enum Register {
 
 pub struct CPU {
     pub regs: [Wrapping<u32>; 19],
-    pub memory: Memory
+    pub memory: Memory,
+    halt: bool
 }
 
 impl CPU {
     pub fn new(mem: Memory) -> Self {
         CPU {
             regs: [Wrapping(0u32); 19],
-            memory: mem
+            memory: mem,
+            halt: false
         }
     }
 
@@ -50,12 +52,21 @@ impl CPU {
         self.regs[reg as usize] = Wrapping(value);
     }
 
+    pub fn run(self: &mut Self) {
+        // Init
+
+        while !self.halt {
+            let instruction = self.load_instruction();
+            let decoded_instruction = DecodedInstruction::decode(&instruction);
+            self.execute_instruction(decoded_instruction);
+        }
+    }
+
     fn load_instruction(self: &mut Self) -> [u32; 2] {
         let pc = self.regs[Register::PC as usize];
         self.regs[Register::PC as usize] += Wrapping(8);
         self.memory.read_instruction(pc.0)
     }
-
 
     fn execute_instruction(self: &mut Self, d: DecodedInstruction) {
 
@@ -64,7 +75,8 @@ impl CPU {
         let reg_3 = d.reg_3 as usize;
 
         match d.instruction_type {
-            NOp => {},
+            NOp => println!("Nop"),
+            Halt => self.halt(),
 
             Increment => self.regs[reg_1] += Wrapping(1),
             Decrement => self.regs[reg_1] -= Wrapping(1),
@@ -85,11 +97,9 @@ impl CPU {
         }
     }
 
-    pub fn run(self: &mut Self) {
-        // Init
-        let instruction = self.load_instruction();
-        let decoded_instruction = DecodedInstruction::decode(&instruction);
-        self.execute_instruction(decoded_instruction);
+    fn halt(self: &mut Self) {
+        println!("Halting CPU at PC=0x{:X}", self.get_register(Register::PC));
+        self.halt = true;
     }
 }
 

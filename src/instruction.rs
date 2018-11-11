@@ -2,7 +2,7 @@
 #[derive(Debug)]
 pub enum Instruction {
     NOp,
-    Invalid,
+    Halt,
 
     /* Arithmetic */
     Increment,
@@ -21,12 +21,15 @@ pub enum Instruction {
 
     /* Load */
     LoadImmediate,
+
+    Invalid,
 }
 
 impl Into<u8> for Instruction {
     fn into(self: Self) -> u8 {
         match self {
             NOp => 0x00,
+            Halt => 0x01,
 
             /* Arithmetic */
             Increment => 0x10,
@@ -55,6 +58,7 @@ impl From<u8> for Instruction {
     fn from(value: u8) -> Instruction {
         match value {
             0x00 => NOp,
+            0x01 => Halt,
 
             /* Arithmetic */
             0x10 => Increment,
@@ -136,11 +140,10 @@ impl DecodedInstruction {
         DecodedInstruction::new(instruction_type, reg_1, reg_2, reg_3, operand)
     }
 
-    pub fn encode(instruction_type: Instruction,
-                  reg_1: u8, reg_2: u8, reg_3: u8, operand: u32) -> [u32; 2] {
+    pub fn encode(self: Self) -> [u32; 2] {
 
-        let t: u8 = instruction_type.into();
-        [(t as u32) << 24 | (reg_1 as u32) << 16 | (reg_2 as u32) << 8 | reg_3 as u32 , operand]
+        let t: u8 = self.instruction_type.into();
+        [(t as u32) << 24 | (self.reg_1 as u32) << 16 | (self.reg_2 as u32) << 8 | self.reg_3 as u32 , self.operand]
     }
 }
 
