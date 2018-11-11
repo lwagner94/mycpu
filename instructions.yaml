@@ -1,45 +1,59 @@
 - name: NOp
   code: 0x00
+  syntax: nop
 
 - name: Halt
   code: 0x01
+  syntax: halt
 
 - name: Increment
   code: 0x10
+  syntax: inc <reg>
 
 - name: Decrement
   code: 0x11
+  syntax: dec <reg>
 
 - name: Add
   code: 0x12
+  syntax: add <reg> <reg> <reg>
 
 - name: Subtract
   code: 0x13
+  syntax: sub <reg> <reg> <reg>
 
 - name: Multiply
   code: 0x14
+  syntax: mul <reg> <reg> <reg>
 
 - name: Divide
   code: 0x15
-
+  syntax: div <reg> <reg> <reg>
 
 - name: Or
   code: 0x20
+  syntax: or <reg> <reg> <reg>
 
 - name: And
   code: 0x21
+  syntax: and <reg> <reg> <reg>
 
 - name: XOr
   code: 0x22
+  syntax: xor <reg> <reg> <reg>
 
 - name: Negate
   code: 0x23
+  syntax: neg <reg>
 
 - name: Complement
   code: 0x24
+  syntax: com <reg>
 
 - name: LoadImmediate
   code: 0x30
+  syntax: ldi <reg> <op>
 
 - name: Invalid
   code: 0xFF
+  syntax: invalid
