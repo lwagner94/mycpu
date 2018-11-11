@@ -4,7 +4,7 @@ extern crate mycpu;
 
 use mycpu::emulator::cpu::CPU;
 use mycpu::emulator::memory::Memory;
-use mycpu::emulator::encoding::DecodedInstruction;
+use mycpu::common::encoding::DecodedInstruction;
 use mycpu::common::generated::instruction::Instruction;
 
 fn main() {

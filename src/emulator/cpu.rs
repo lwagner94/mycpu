@@ -1,7 +1,7 @@
 use std::num::Wrapping;
 
-use emulator::encoding::DecodedInstruction;
-use super::super::common::generated::instruction::Instruction::{*};
+use common::encoding::DecodedInstruction;
+use common::generated::instruction::Instruction::{*};
 
 use emulator::memory::Memory;
 

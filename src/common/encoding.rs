@@ -2,7 +2,7 @@
 
 use super::super::common::generated::instruction::Instruction;
 
-
+#[derive(Debug)]
 pub struct DecodedInstruction {
     pub instruction_type: Instruction,
     pub reg_1: u8,

@@ -3,20 +3,20 @@ use std::io::BufRead;
 
 #[derive(Debug, PartialOrd, PartialEq)]
 pub struct Line {
-    line_number: usize,
-    text: String,
+    pub line_number: usize,
+    pub text: String,
 }
 
 #[derive(Debug)]
 pub struct Token {
-    token: String,
-    position: usize
+    pub token: String,
+    pub position: usize
 }
 
 #[derive(Debug)]
 pub struct TokenizedLine {
-    line: Line,
-    tokens: Vec<Token>
+    pub line: Line,
+    pub tokens: Vec<Token>
 }
 
 fn strip_comments(line: String) -> String {
@@ -61,7 +61,6 @@ pub fn tokenize(reader: &mut BufRead) -> Vec<TokenizedLine> {
 
     for line in lines {
         let text = trim(strip_comments(line.text.clone()));
-        let line_number = line.line_number;
         let tokens: Vec<Token> = tokenize_line(&text);
 
         tokenized_lines.push(TokenizedLine {
