@@ -2,5 +2,5 @@
 **/*.rs.bk
 .idea
 
-/src/generated/*
-!/src/generated/mod.rs
+/src/emulator/generated/*
+!/src/emulator/generated/mod.rs
