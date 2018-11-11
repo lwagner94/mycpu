@@ -4,4 +4,12 @@ version = "0.1.0"
 authors = ["Lukas Wagner <lwagner94@posteo.at>"]
 build = "build.rs"
 
+[[bin]]
+name = "asm"
+path = "src/assembler/main.rs"
+
+[[bin]]
+name = "emulator"
+path = "src/emulator/main.rs"
+
 [dependencies]
