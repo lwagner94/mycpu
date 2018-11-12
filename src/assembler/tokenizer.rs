@@ -48,7 +48,8 @@ fn split_lines(reader: &mut BufRead) -> Vec<Line> {
 }
 
 fn tokenize_line(text: &str) -> Vec<Token> {
-    text.split_whitespace().map(|s| Token {
+    let replaced = text.replace(",", " ");
+    replaced.split_whitespace().map(|s| Token {
         token: s.into(),
         position: 0,
     }).collect()
