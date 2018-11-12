@@ -23,7 +23,11 @@ impl DecodedInstruction {
         }
     }
 
-    pub fn decode(instruction: &[u8; 8]) -> DecodedInstruction {
+    pub fn invalid() -> Self {
+        DecodedInstruction::new(Instruction::Invalid, 0, 0, 0, 0)
+    }
+
+    pub fn decode(instruction: &[u8; 8]) -> Self {
         let instruction_type = Instruction::from(instruction[0]);
 
         let mut operand_reader = Cursor::new(&instruction[4..=7]);

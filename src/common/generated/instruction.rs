@@ -17,6 +17,10 @@ pub enum Instruction {
     Negate,
     Complement,
     LoadImmediate,
+    Load,
+    Store,
+    Push,
+    Pop,
     Invalid,
 
 }
@@ -38,6 +42,10 @@ impl Into<u8> for Instruction {
             Instruction::Negate => 0x23,
             Instruction::Complement => 0x24,
             Instruction::LoadImmediate => 0x30,
+            Instruction::Load => 0x31,
+            Instruction::Store => 0x32,
+            Instruction::Push => 0x33,
+            Instruction::Pop => 0x34,
             Instruction::Invalid => 0xff,
 
         }
@@ -61,6 +69,10 @@ impl From<u8> for Instruction {
             0x23 => Instruction::Negate,
             0x24 => Instruction::Complement,
             0x30 => Instruction::LoadImmediate,
+            0x31 => Instruction::Load,
+            0x32 => Instruction::Store,
+            0x33 => Instruction::Push,
+            0x34 => Instruction::Pop,
             0xff => Instruction::Invalid,
 
             _ => Instruction::Invalid

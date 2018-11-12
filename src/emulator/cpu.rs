@@ -32,7 +32,8 @@ pub enum Register {
 pub struct CPU {
     pub regs: [Wrapping<u32>; 19],
     pub memory: Memory,
-    halt: bool
+    halt: bool,
+    instruction: DecodedInstruction
 }
 
 impl CPU {
@@ -40,7 +41,8 @@ impl CPU {
         CPU {
             regs: [Wrapping(0u32); 19],
             memory: mem,
-            halt: false
+            halt: false,
+            instruction: DecodedInstruction::invalid()
         }
     }
 
@@ -67,9 +69,9 @@ impl CPU {
     }
 
     fn load_instruction(self: &mut Self) -> [u8; 8] {
-        let pc = self.regs[Register::PC as usize];
+        let pc = self.regs[Register::PC as usize].0;
         self.regs[Register::PC as usize] += Wrapping(8);
-        self.memory.read_instruction(pc.0)
+        self.memory.read_instruction(pc)
     }
 
     fn execute_instruction(self: &mut Self, d: DecodedInstruction) {
@@ -96,9 +98,23 @@ impl CPU {
             Complement => self.regs[reg_1] = !self.regs[reg_1],
 
             LoadImmediate => self.regs[reg_1] = Wrapping(d.operand),
+            Load => self.regs[reg_1] = Wrapping(self.memory.read_doubleword(d.operand)),
+            Store => self.memory.write_doubleword(d.operand, self.regs[reg_1].0),
+            Push => self.push(reg_1),
+            Pop => self.pop(reg_1),
 
             Invalid => panic!("Invalid instruction {:?}", d.instruction_type)
         }
+    }
+
+    fn push(&mut self, register: usize) {
+        self.regs[Register::SP as usize] -= Wrapping(4);
+        self.memory.write_doubleword(self.regs[Register::SP as usize].0, self.regs[register].0);
+    }
+
+    fn pop(&mut self, register: usize) {
+        self.regs[register] = Wrapping(self.memory.read_doubleword(self.regs[Register::SP as usize].0));
+        self.regs[Register::SP as usize] += Wrapping(4);
     }
 
     fn halt(self: &mut Self) {

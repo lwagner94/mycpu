@@ -82,6 +82,31 @@
   regs: 1
   op: 1
 
+- name: Load
+  code: 0x31
+  keyword: ld
+  regs: 1
+  op: 1
+
+- name: Store
+  code: 0x32
+  keyword: st
+  regs: 1
+  op: 1
+
+
+- name: Push
+  code: 0x33
+  keyword: push
+  regs: 1
+  op: 0
+
+- name: Pop
+  code: 0x34
+  keyword: pop
+  regs: 1
+  op: 0
+
 - name: Invalid
   code: 0xFF
   keyword: invalid
