@@ -1,59 +1,89 @@
 - name: NOp
   code: 0x00
-  syntax: nop
+  keyword: nop
+  regs: 0
+  op: 0
 
 - name: Halt
   code: 0x01
-  syntax: halt
+  keyword: halt
+  regs: 0
+  op: 0
 
 - name: Increment
   code: 0x10
-  syntax: inc <reg>
+  keyword: inc
+  regs: 1
+  op: 0
 
 - name: Decrement
   code: 0x11
-  syntax: dec <reg>
+  keyword: dec
+  regs: 1
+  op: 0
 
 - name: Add
   code: 0x12
-  syntax: add <reg> <reg> <reg>
+  keyword: add
+  regs: 3
+  op: 0
 
 - name: Subtract
   code: 0x13
-  syntax: sub <reg> <reg> <reg>
+  keyword: sub
+  regs: 3
+  op: 0
 
 - name: Multiply
   code: 0x14
-  syntax: mul <reg> <reg> <reg>
+  keyword: mul
+  regs: 3
+  op: 0
 
 - name: Divide
   code: 0x15
-  syntax: div <reg> <reg> <reg>
+  keyword: div
+  regs: 3
+  op: 0
 
 - name: Or
   code: 0x20
-  syntax: or <reg> <reg> <reg>
+  keyword: or
+  regs: 3
+  op: 0
 
 - name: And
   code: 0x21
-  syntax: and <reg> <reg> <reg>
+  keyword: and
+  regs: 3
+  op: 0
 
 - name: XOr
   code: 0x22
-  syntax: xor <reg> <reg> <reg>
+  keyword: xor
+  regs: 3
+  op: 0
 
 - name: Negate
   code: 0x23
-  syntax: neg <reg>
+  keyword: neg
+  regs: 1
+  op: 0
 
 - name: Complement
   code: 0x24
-  syntax: com <reg>
+  keyword: com
+  regs: 1
+  op: 0
 
 - name: LoadImmediate
   code: 0x30
-  syntax: ldi <reg> <op>
+  keyword: ldi
+  regs: 1
+  op: 1
 
 - name: Invalid
   code: 0xFF
-  syntax: invalid
+  keyword: invalid
+  regs: 0
+  op: 0

@@ -1,55 +1,46 @@
 from string import Template
 import yaml
 
+match_template = """ 
+        "$keyword" if line.tokens.len() == $if_guard => DecodedInstruction::new(
+            Instruction::$name,
+            $reg1,
+            $reg2,
+            $reg3,
+            $operand),"""
 
-TEMPLATE = """
-// AUTOMATICALLY GENERATED, DO NOT EDIT!
-
-#[derive(Debug)]
-pub enum Instruction {
-$instr
-}
-
-impl Into<u8> for Instruction {
-    fn into(self: Self) -> u8 {
-        match self {
-$instr_to_code
-        }
-    }
-}
-
-impl From<u8> for Instruction {
-    fn from(value: u8) -> Instruction {
-        match value {
-$code_to_instr
-            _ => Instruction::Invalid
-        }
-    }
-}
-"""
-
+R1 = "match_register_name(line.tokens[1].token.as_str())?"
+R2 = "match_register_name(line.tokens[2].token.as_str())?"
+R3 = "match_register_name(line.tokens[3].token.as_str())?"
+OP = "0"
 
 if __name__ == "__main__":
     with open("instructions.yaml") as f:
         instructions = yaml.safe_load(f)
 
-    instr = ""
-    instr_to_code = ""
-    code_to_instr = ""
+    with open("src/assembler/matcher.rs.template") as f:
+        template = f.read()
+    cases = ""
 
     for instruction in instructions:
         name = instruction["name"]
-        code = hex(instruction["code"])
+        keyword = instruction["keyword"]
+        regs = instruction["regs"]
+        op = instruction["op"]
 
-        instr += f"    {name},\n"
+        if_guard = regs + op + 1
 
-        instr_to_code += f"            Instruction::{name} => {code},\n"
+        reg1 = R1 if regs >= 1 else "0"
+        reg2 = R2 if regs >= 2 else "0"
+        reg3 = R3 if regs >= 3 else "0"
+        operand = OP if op == 1 else "0"
 
-        code_to_instr += f"            {code} => Instruction::{name},\n"
+        t = Template(match_template)
+        cases += t.substitute(**locals())
 
-    t = Template(TEMPLATE)
+    t = Template(template)
 
-    with open("src/common/generated/instruction.rs", "w") as f:
+    with open("src/assembler/generated/matcher.rs", "w") as f:
         f.write(t.substitute(**locals()))
 
 
