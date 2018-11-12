@@ -21,6 +21,7 @@ pub enum Instruction {
     Store,
     Push,
     Pop,
+    Jump,
     Invalid,
 
 }
@@ -46,6 +47,7 @@ impl Into<u8> for Instruction {
             Instruction::Store => 0x32,
             Instruction::Push => 0x33,
             Instruction::Pop => 0x34,
+            Instruction::Jump => 0x40,
             Instruction::Invalid => 0xff,
 
         }
@@ -73,6 +75,7 @@ impl From<u8> for Instruction {
             0x32 => Instruction::Store,
             0x33 => Instruction::Push,
             0x34 => Instruction::Pop,
+            0x40 => Instruction::Jump,
             0xff => Instruction::Invalid,
 
             _ => Instruction::Invalid

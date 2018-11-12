@@ -107,6 +107,12 @@
   regs: 1
   op: 0
 
+- name: Jump
+  code: 0x40
+  keyword: jmp
+  regs: 0
+  op: 1
+
 - name: Invalid
   code: 0xFF
   keyword: invalid

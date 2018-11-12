@@ -81,7 +81,7 @@ impl CPU {
         let reg_3 = d.reg_3 as usize;
 
         match d.instruction_type {
-            NOp => println!("Nop"),
+            NOp => {},
             Halt => self.halt(),
 
             Increment => self.regs[reg_1] += Wrapping(1),
@@ -102,6 +102,8 @@ impl CPU {
             Store => self.memory.write_doubleword(d.operand, self.regs[reg_1].0),
             Push => self.push(reg_1),
             Pop => self.pop(reg_1),
+
+            Jump => self.regs[Register::PC as usize] = Wrapping(d.operand),
 
             Invalid => panic!("Invalid instruction {:?}", d.instruction_type)
         }

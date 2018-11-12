@@ -12,7 +12,7 @@ match_template = """
 R1 = "match_register_name(line.tokens[1].token.as_str())?"
 R2 = "match_register_name(line.tokens[2].token.as_str())?"
 R3 = "match_register_name(line.tokens[3].token.as_str())?"
-OP = "parse_numeric_literal(line.tokens[2].token.as_str())?"
+OP = "parse_numeric_literal(line.tokens[{}].token.as_str())?"
 
 if __name__ == "__main__":
     with open("instructions.yaml") as f:
@@ -33,7 +33,7 @@ if __name__ == "__main__":
         reg1 = R1 if regs >= 1 else "0"
         reg2 = R2 if regs >= 2 else "0"
         reg3 = R3 if regs >= 3 else "0"
-        operand = OP if op == 1 else "0"
+        operand = OP.format(regs + 1) if op == 1 else "0"
 
         t = Template(match_template)
         cases += t.substitute(**locals())
