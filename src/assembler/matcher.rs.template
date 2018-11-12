@@ -3,6 +3,7 @@ use assembler::tokenizer::TokenizedLine;
 use assembler::parser::ParsedInstruction;
 use common::encoding::DecodedInstruction;
 use assembler::parser::match_register_name;
+use assembler::parser::parse_numeric_literal;
 
 
 pub fn match_instruction(line: &TokenizedLine) -> Option<ParsedInstruction> {

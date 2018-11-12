@@ -12,7 +12,7 @@ match_template = """
 R1 = "match_register_name(line.tokens[1].token.as_str())?"
 R2 = "match_register_name(line.tokens[2].token.as_str())?"
 R3 = "match_register_name(line.tokens[3].token.as_str())?"
-OP = "0"
+OP = "parse_numeric_literal(line.tokens[2].token.as_str())?"
 
 if __name__ == "__main__":
     with open("instructions.yaml") as f:
