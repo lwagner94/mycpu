@@ -1,5 +1,8 @@
+use std::io::Write;
+use std::io::Read;
+
 pub struct Memory {
-    data: Vec<u32>
+    data: Vec<u8>
 }
 
 impl Memory {
@@ -10,31 +13,33 @@ impl Memory {
     }
 
     fn address_to_index(self: &Self, addr: u32) -> usize {
-        if addr % 4 != 0 {
-            panic!("Unaligned memory access at {:x}!", addr);
-        }
-        (addr as usize) / 4
+        (addr as usize)
     }
 
-    pub fn read(self: &Self, addr: u32) -> u32 {
+    pub fn read(self: &Self, addr: u32) -> u8 {
         self.data[self.address_to_index(addr)]
     }
 
-    pub fn read_instruction(self: &Self, addr: u32) -> [u32; 2] {
+    pub fn read_instruction(self: &Self, addr: u32) -> [u8; 8] {
         let index = self.address_to_index(addr);
-        let mut res = [0; 2];
-        res.copy_from_slice(&self.data[index..index + 2]);
+        let mut res = [0; 8];
+        res.copy_from_slice(&self.data[index..index + 8]);
         res
     }
 
-    pub fn write(self: &mut Self, addr: u32, value: u32) {
+    pub fn write(self: &mut Self, addr: u32, value: u8) {
         let index = self.address_to_index(addr);
         self.data[index] = value;
     }
 
-    pub fn write_instruction(self: &mut Self, addr: u32, instruction: [u32; 2]) {
+    pub fn write_instruction(self: &mut Self, addr: u32, instruction: [u8; 8]) {
         let index = self.address_to_index(addr);
-        self.data[index..index + 2].copy_from_slice(&instruction);
+        self.data[index..index + 8].copy_from_slice(&instruction);
+    }
+
+    pub fn write_all(&mut self, bytes: &[u8], offset: u32) {
+        let index = self.address_to_index(offset);
+        self.data[index..index + bytes.len()].copy_from_slice(bytes);
     }
 }
 
@@ -43,32 +48,17 @@ mod tests {
     use super::*;
 
     #[test]
-    #[should_panic]
-    fn test_addr_to_index_fail() {
-        let mem = Memory::new(0);
-        mem.address_to_index(3);
-    }
-
-    #[test]
-    fn test_addr_to_index_pass() {
-        let mem = Memory::new(0);
-        assert_eq!(mem.address_to_index(0), 0);
-        assert_eq!(mem.address_to_index(4), 1);
-        assert_eq!(mem.address_to_index(16), 4);
-    }
-
-    #[test]
     fn test_write_instruction() {
         let mut mem = Memory::new(8);
-        mem.write_instruction(8, [10, 20]);
-        assert_eq!(mem.data, [0, 0, 10, 20, 0, 0, 0, 0]);
+        mem.write_instruction(0, [10, 20, 1, 2, 3, 4, 5, 6]);
+        assert_eq!(mem.data, [10, 20, 1, 2, 3, 4, 5, 6]);
     }
 
     #[test]
     fn test_write() {
         let mut mem = Memory::new(8);
-        mem.write(8, 10);
-        assert_eq!(mem.data, [0, 0, 10, 0, 0, 0, 0, 0]);
+        mem.write(7, 10);
+        assert_eq!(mem.data, [0, 0, 0, 0, 0, 0, 0, 10]);
     }
 
     #[test]
@@ -76,7 +66,7 @@ mod tests {
         let mem = Memory {
             data: vec![0, 0, 10, 20, 0, 0, 0, 0]
         };
-        assert_eq!(mem.read_instruction(8), [10, 20]);
+        assert_eq!(mem.read_instruction(0), [0, 0, 10, 20, 0, 0, 0, 0]);
     }
 
     #[test]
@@ -85,8 +75,8 @@ mod tests {
             data: vec![0, 0, 10, 20, 0, 0, 0, 0]
         };
         assert_eq!(mem.read(0), 0);
-        assert_eq!(mem.read(4), 0);
-        assert_eq!(mem.read(8), 10);
-        assert_eq!(mem.read(12), 20);
+        assert_eq!(mem.read(1), 0);
+        assert_eq!(mem.read(2), 10);
+        assert_eq!(mem.read(3), 20);
     }
 }

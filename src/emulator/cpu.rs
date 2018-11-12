@@ -52,6 +52,10 @@ impl CPU {
         self.regs[reg as usize] = Wrapping(value);
     }
 
+    pub fn print_state(&self) {
+        println!("{:#?}", self.regs);
+    }
+
     pub fn run(self: &mut Self) {
         // Init
 
@@ -62,7 +66,7 @@ impl CPU {
         }
     }
 
-    fn load_instruction(self: &mut Self) -> [u32; 2] {
+    fn load_instruction(self: &mut Self) -> [u8; 8] {
         let pc = self.regs[Register::PC as usize];
         self.regs[Register::PC as usize] += Wrapping(8);
         self.memory.read_instruction(pc.0)

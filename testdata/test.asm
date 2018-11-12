@@ -1,5 +1,4 @@
-add r0, r1, r2 // Foobar
-xor r3, r4, r5
-neg r0
-ldi r0, 0xA
+ldi r0, 10
+ldi r1, 20
+add r2, r0, r1
 halt
