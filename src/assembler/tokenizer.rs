@@ -62,6 +62,9 @@ pub fn tokenize(reader: &mut BufRead) -> Vec<TokenizedLine> {
 
     for line in lines {
         let text = trim(strip_comments(line.text.clone()));
+        if text.is_empty() {
+            continue;
+        }
         let tokens: Vec<Token> = tokenize_line(&text);
 
         tokenized_lines.push(TokenizedLine {
