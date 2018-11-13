@@ -1,12 +1,8 @@
 use common::generated::instruction::Instruction;
 use assembler::tokenizer::TokenizedLine;
-use assembler::parser::ParsedInstruction;
-use common::encoding::DecodedInstruction;
-use assembler::parser::match_register_name;
-use assembler::parser::parse_numeric_literal;
+use assembler::parser::{*};
 
-
-pub fn match_instruction(line: &TokenizedLine) -> Option<ParsedInstruction> {
+pub fn match_instruction(line: &TokenizedLine) -> Option<ParsedLine> {
     if line.tokens.len() == 0 {
         return None;
     }
@@ -18,5 +14,5 @@ $cases
     };
 
 
-    Some(ParsedInstruction::Instruction(dec))
+    Some(ParsedLine::Instruction(dec))
 }

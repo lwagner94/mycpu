@@ -1,4 +1,6 @@
-ldi sp, 0xA0 // 0
-jmp 16       // 8
-ldi r0, 0xFF // 16
-halt         // 24
+jmp foo
+ldi r0, 100
+ldi r1, 200
+foo:
+ldi r3, 300
+halt

@@ -5,7 +5,7 @@ import yaml
 TEMPLATE = """
 // AUTOMATICALLY GENERATED, DO NOT EDIT!
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub enum Instruction {
 $instr
 }

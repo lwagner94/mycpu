@@ -1,6 +1,3 @@
-use std::io::Write;
-use std::io::Read;
-
 pub struct Memory {
     data: Vec<u8>
 }

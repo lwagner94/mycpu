@@ -2,17 +2,15 @@ from string import Template
 import yaml
 
 match_template = """ 
-        "$keyword" if line.tokens.len() == $if_guard => DecodedInstruction::new(
+        "$keyword" if line.tokens.len() == $if_guard => MatchedInstruction::new(
             Instruction::$name,
             $reg1,
             $reg2,
             $reg3,
             $operand),"""
 
-R1 = "match_register_name(line.tokens[1].token.as_str())?"
-R2 = "match_register_name(line.tokens[2].token.as_str())?"
-R3 = "match_register_name(line.tokens[3].token.as_str())?"
-OP = "parse_numeric_literal(line.tokens[{}].token.as_str())?"
+R1 = "parse_register_name(line.tokens[{}].token.as_str())?"
+OP = "parse_operand(line.tokens[{}].token.as_str())?"
 
 if __name__ == "__main__":
     with open("instructions.yaml") as f:
@@ -30,10 +28,10 @@ if __name__ == "__main__":
 
         if_guard = regs + op + 1
 
-        reg1 = R1 if regs >= 1 else "0"
-        reg2 = R2 if regs >= 2 else "0"
-        reg3 = R3 if regs >= 3 else "0"
-        operand = OP.format(regs + 1) if op == 1 else "0"
+        reg1 = R1.format(1) if regs >= 1 else "0"
+        reg2 = R1.format(1) if regs >= 2 else "0"
+        reg3 = R1.format(1) if regs >= 3 else "0"
+        operand = OP.format(regs + 1) if op == 1 else "Op::Number(0)"
 
         t = Template(match_template)
         cases += t.substitute(**locals())

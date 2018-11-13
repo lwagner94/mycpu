@@ -6,8 +6,6 @@ use std::env;
 
 use mycpu::emulator::cpu::CPU;
 use mycpu::emulator::memory::Memory;
-use mycpu::common::encoding::DecodedInstruction;
-use mycpu::common::generated::instruction::Instruction;
 use mycpu::assembler::assembler::assemble_file;
 
 

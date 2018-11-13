@@ -1,16 +1,44 @@
-use common::encoding::DecodedInstruction;
 use assembler::tokenizer::TokenizedLine;
 use assembler::generated::matcher;
 use std::str::FromStr;
+use common::generated::instruction::Instruction;
 
 #[derive(Debug)]
-pub enum ParsedInstruction {
-    Instruction(DecodedInstruction),
+pub enum ParsedLine {
+    Instruction(MatchedInstruction),
+    Label(String)
+}
 
+#[derive(Debug)]
+pub enum Op {
+    Number(u32),
+    Label(String)
 }
 
 
-pub fn match_register_name(name: &str) -> Option<u8> {
+#[derive(Debug)]
+pub struct MatchedInstruction {
+    pub instruction: Instruction,
+    pub reg1: u8,
+    pub reg2: u8,
+    pub reg3: u8,
+    pub op: Op
+}
+
+
+impl MatchedInstruction {
+    pub fn new(instruction: Instruction, reg1: u8, reg2: u8, reg3: u8, op: Op) -> Self {
+        MatchedInstruction {
+            instruction,
+            reg1,
+            reg2,
+            reg3,
+            op
+        }
+    }
+}
+
+pub fn parse_register_name(name: &str) -> Option<u8> {
     match name {
         "r0" => Some(0),
         "r1" => Some(1),
@@ -40,55 +68,47 @@ pub fn parse_numeric_literal(literal: &str) -> Option<u32> {
         let without_prefix = literal.trim_left_matches("0x");
         u32::from_str_radix(without_prefix, 16).ok()
     }
+        else {
+            u32::from_str(literal).ok()
+        }
+}
+
+pub fn parse_operand(s: &str) -> Option<Op> {
+    if let Some(number) = parse_numeric_literal(s) {
+        Some(Op::Number(number))
+    }
+        else {
+            Some(Op::Label(s.into()))
+        }
+}
+
+
+pub fn parse_label(token: &TokenizedLine) -> Option<ParsedLine> {
+    if token.tokens.len() == 1 && token.tokens[0].token.ends_with(":") {
+        let label = token.tokens[0].token.replace(":", "");
+        Some(ParsedLine::Label(label))
+    }
     else {
-        u32::from_str(literal).ok()
+        None
     }
 }
 
 
-pub fn parse(tokens: Vec<TokenizedLine>) -> Option<Vec<ParsedInstruction>> {
-//    matcher::
+pub fn parse(tokens: Vec<TokenizedLine>) -> Option<Vec<ParsedLine>> {
     let mut parsed_instructions = Vec::new();
 
     for token in tokens {
-        let i = matcher::match_instruction(&token)?;
-        parsed_instructions.push(i);
+        if let Some(instr) = parse_label(&token) {
+            parsed_instructions.push(instr);
+        }
+        else if let Some(instr) = matcher::match_instruction(&token) {
+            parsed_instructions.push(instr);
+        }
+        else {
+            return None;
+        }
     }
 
     Some(parsed_instructions)
 }
 
-#[cfg(test)]
-mod tests {
-    use super::*;
-
-    #[test]
-    fn test_match_register_name() {
-        assert_eq!(match_register_name("r0"), Some(0));
-    }
-
-    #[test]
-    fn test_match_register_name_invalid() {
-        assert_eq!(match_register_name("rf"), None);
-    }
-
-    #[test]
-    fn test_parse_numeric_literal_decimal() {
-        assert_eq!(parse_numeric_literal("100"), Some(100));
-    }
-
-    #[test]
-    fn test_parse_numeric_literal_hex() {
-        assert_eq!(parse_numeric_literal("0xFF"), Some(255));
-    }
-
-    #[test]
-    fn test_parse_numeric_literal_hex_fail() {
-        assert_eq!(parse_numeric_literal("0xFFx0"), None);
-    }
-
-    #[test]
-    fn test_parse_numeric_literal_fail() {
-        assert_eq!(parse_numeric_literal("abc"), None);
-    }
-}

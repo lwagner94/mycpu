@@ -2,12 +2,8 @@
 
 extern crate mycpu;
 
-use std::fs::File;
-use std::io::BufReader;
 use std::env;
 
-use mycpu::assembler::tokenizer;
-use mycpu::assembler::parser::parse;
 use mycpu::assembler::assembler::assemble_file;
 
 

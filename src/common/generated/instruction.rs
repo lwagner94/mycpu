@@ -1,7 +1,7 @@
 
 // AUTOMATICALLY GENERATED, DO NOT EDIT!
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub enum Instruction {
     NOp,
     Halt,
