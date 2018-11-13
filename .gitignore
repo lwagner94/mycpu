@@ -2,8 +2,8 @@
 **/*.rs.bk
 .idea
 
-/src/common/generated/*
-!/src/common/generated/mod.rs
+#/src/common/generated/*
+#!/src/common/generated/mod.rs
 
-/src/assembler/generated/*
-!/src/assembler/generated/mod.rs
+#/src/assembler/generated/*
+#!/src/assembler/generated/mod.rs
