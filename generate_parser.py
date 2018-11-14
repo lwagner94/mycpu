@@ -29,8 +29,8 @@ if __name__ == "__main__":
         if_guard = regs + op + 1
 
         reg1 = R1.format(1) if regs >= 1 else "0"
-        reg2 = R1.format(1) if regs >= 2 else "0"
-        reg3 = R1.format(1) if regs >= 3 else "0"
+        reg2 = R1.format(2) if regs >= 2 else "0"
+        reg3 = R1.format(3) if regs >= 3 else "0"
         operand = OP.format(regs + 1) if op == 1 else "Op::Number(0)"
 
         t = Template(match_template)
