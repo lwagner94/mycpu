@@ -104,6 +104,8 @@ impl CPU {
             Pop => self.pop(reg_1),
 
             Jump => self.regs[Register::PC as usize] = Wrapping(d.operand),
+            Call => self.call(d.operand),
+            Return => self.return_from_call(),
 
             Invalid => panic!("Invalid instruction {:?}", d.instruction_type)
         }
@@ -117,6 +119,15 @@ impl CPU {
     fn pop(&mut self, register: usize) {
         self.regs[register] = Wrapping(self.memory.read_doubleword(self.regs[Register::SP as usize].0));
         self.regs[Register::SP as usize] += Wrapping(4);
+    }
+
+    fn call(&mut self, address: u32) {
+        self.push(Register::PC as usize);
+        self.regs[Register::PC as usize] = Wrapping(address);
+    }
+
+    fn return_from_call(&mut self) {
+        let pc = self.pop(Register::PC as usize);
     }
 
     fn halt(self: &mut Self) {

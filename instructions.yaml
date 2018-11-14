@@ -113,6 +113,18 @@
   regs: 0
   op: 1
 
+- name : Call
+  code: 0x41
+  keyword: call
+  regs: 0
+  op: 1
+
+- name: Return
+  code: 0x42
+  keyword: ret
+  regs: 0
+  op: 0
+
 - name: Invalid
   code: 0xFF
   keyword: invalid

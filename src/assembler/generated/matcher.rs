@@ -124,6 +124,18 @@ pub fn match_instruction(line: &TokenizedLine) -> Option<ParsedLine> {
             0,
             0,
             parse_operand(line.tokens[1].token.as_str())?), 
+        "call" if line.tokens.len() == 2 => MatchedInstruction::new(
+            Instruction::Call,
+            0,
+            0,
+            0,
+            parse_operand(line.tokens[1].token.as_str())?), 
+        "ret" if line.tokens.len() == 1 => MatchedInstruction::new(
+            Instruction::Return,
+            0,
+            0,
+            0,
+            Op::Number(0)), 
         "invalid" if line.tokens.len() == 1 => MatchedInstruction::new(
             Instruction::Invalid,
             0,
