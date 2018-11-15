@@ -64,6 +64,12 @@ pub fn match_instruction(line: &TokenizedLine) -> Option<ParsedLine> {
             parse_register_name(line.tokens[2].token.as_str())?,
             0,
             Op::Number(0)), 
+        "cmpi" if line.tokens.len() == 3 => MatchedInstruction::new(
+            Instruction::CompareImmediate,
+            parse_register_name(line.tokens[1].token.as_str())?,
+            0,
+            0,
+            parse_operand(line.tokens[2].token.as_str())?), 
         "or" if line.tokens.len() == 4 => MatchedInstruction::new(
             Instruction::Or,
             parse_register_name(line.tokens[1].token.as_str())?,
@@ -152,6 +158,24 @@ pub fn match_instruction(line: &TokenizedLine) -> Option<ParsedLine> {
             Instruction::Return,
             0,
             0,
+            0,
+            Op::Number(0)), 
+        "breq" if line.tokens.len() == 2 => MatchedInstruction::new(
+            Instruction::BranchEqual,
+            0,
+            0,
+            0,
+            parse_operand(line.tokens[1].token.as_str())?), 
+        "brne" if line.tokens.len() == 2 => MatchedInstruction::new(
+            Instruction::BranchNotEqual,
+            0,
+            0,
+            0,
+            parse_operand(line.tokens[1].token.as_str())?), 
+        "mov" if line.tokens.len() == 3 => MatchedInstruction::new(
+            Instruction::Move,
+            parse_register_name(line.tokens[1].token.as_str())?,
+            parse_register_name(line.tokens[2].token.as_str())?,
             0,
             Op::Number(0)), 
         "invalid" if line.tokens.len() == 1 => MatchedInstruction::new(

@@ -92,6 +92,7 @@ impl CPU {
     }
 
     pub fn print_state(&self) {
+        eprintln!("Registers:");
         eprintln!("{:#?}", self.regs);
     }
 
@@ -137,6 +138,11 @@ impl CPU {
                 let r = self.regs[reg_2].0;
                 self.compare(l, r);
             },
+            CompareImmediate => {
+                let l = self.regs[reg_1].0;
+                let r = d.operand;
+                self.compare(l, r);
+            }
 
             And => self.regs[reg_1] = self.regs[reg_2] & self.regs[reg_3],
             Or => self.regs[reg_1] = self.regs[reg_2] | self.regs[reg_3],
@@ -155,6 +161,16 @@ impl CPU {
             Jump => self.regs[Register::PC as usize] = Wrapping(d.operand),
             Call => self.call(d.operand),
             Return => self.return_from_call(),
+
+            BranchEqual => if self.get_status_bit(StatusBit::Zero) {
+                self.regs[Register::PC as usize] = Wrapping(d.operand);
+            }
+
+            BranchNotEqual => if !self.get_status_bit(StatusBit::Zero) {
+                self.regs[Register::PC as usize] = Wrapping(d.operand);
+            }
+
+            Move => self.regs[reg_1] = self.regs[reg_2],
 
             Invalid => panic!("Invalid instruction {:?}", d.instruction_type)
         }
@@ -368,4 +384,31 @@ mod tests {
 //        assert!(cpu.get_status_bit(StatusBit::Carry));
 //        assert!(!cpu.get_status_bit(StatusBit::Negative));
 //    }
+    #[test]
+    fn test_branch_equal() {
+        let mut cpu = create_cpu();
+        cpu.execute_instruction(DecodedInstruction::new(
+            BranchEqual, 0, 0, 0, 0xCAFEBABE));
+        assert_ne!(cpu.get_register(Register::PC), 0xCAFEBABE);
+        cpu.set_status_bit(StatusBit::Zero, true);
+        cpu.execute_instruction(DecodedInstruction::new(
+            BranchEqual, 0, 0, 0, 0xCAFEBABE));
+
+        assert_eq!(cpu.get_register(Register::PC), 0xCAFEBABE);
+    }
+
+    #[test]
+    fn test_branch_not_equal() {
+        let mut cpu = create_cpu();
+        cpu.set_status_bit(StatusBit::Zero, true);
+        cpu.execute_instruction(DecodedInstruction::new(
+            BranchNotEqual, 0, 0, 0, 0xCAFEBABE));
+
+        assert_ne!(cpu.get_register(Register::PC), 0xCAFEBABE);
+
+        cpu.set_status_bit(StatusBit::Zero, false);
+        cpu.execute_instruction(DecodedInstruction::new(
+            BranchNotEqual, 0, 0, 0, 0xCAFEBABE));
+        assert_eq!(cpu.get_register(Register::PC), 0xCAFEBABE);
+    }
 }

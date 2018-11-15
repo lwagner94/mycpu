@@ -12,6 +12,7 @@ pub enum Instruction {
     Multiply,
     Divide,
     Compare,
+    CompareImmediate,
     Or,
     And,
     XOr,
@@ -27,6 +28,9 @@ pub enum Instruction {
     Jump,
     Call,
     Return,
+    BranchEqual,
+    BranchNotEqual,
+    Move,
     Invalid,
 
 }
@@ -43,6 +47,7 @@ impl Into<u8> for Instruction {
             Instruction::Multiply => 0x14,
             Instruction::Divide => 0x15,
             Instruction::Compare => 0x16,
+            Instruction::CompareImmediate => 0x17,
             Instruction::Or => 0x20,
             Instruction::And => 0x21,
             Instruction::XOr => 0x22,
@@ -58,6 +63,9 @@ impl Into<u8> for Instruction {
             Instruction::Jump => 0x40,
             Instruction::Call => 0x41,
             Instruction::Return => 0x42,
+            Instruction::BranchEqual => 0x50,
+            Instruction::BranchNotEqual => 0x51,
+            Instruction::Move => 0x60,
             Instruction::Invalid => 0xff,
 
         }
@@ -76,6 +84,7 @@ impl From<u8> for Instruction {
             0x14 => Instruction::Multiply,
             0x15 => Instruction::Divide,
             0x16 => Instruction::Compare,
+            0x17 => Instruction::CompareImmediate,
             0x20 => Instruction::Or,
             0x21 => Instruction::And,
             0x22 => Instruction::XOr,
@@ -91,6 +100,9 @@ impl From<u8> for Instruction {
             0x40 => Instruction::Jump,
             0x41 => Instruction::Call,
             0x42 => Instruction::Return,
+            0x50 => Instruction::BranchEqual,
+            0x51 => Instruction::BranchNotEqual,
+            0x60 => Instruction::Move,
             0xff => Instruction::Invalid,
 
             _ => Instruction::Invalid

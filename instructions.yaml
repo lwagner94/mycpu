@@ -52,6 +52,12 @@
   regs: 2
   op: 0
 
+- name: CompareImmediate
+  code: 0x17
+  keyword: cmpi
+  regs: 1
+  op: 1
+
 - name: Or
   code: 0x20
   keyword: or
@@ -141,6 +147,24 @@
   code: 0x42
   keyword: ret
   regs: 0
+  op: 0
+
+- name: BranchEqual
+  code: 0x50
+  keyword: breq
+  regs: 0
+  op: 1
+
+- name: BranchNotEqual
+  code: 0x51
+  keyword: brne
+  regs: 0
+  op: 1
+
+- name: Move
+  code: 0x60
+  keyword: mov
+  regs: 2
   op: 0
 
 - name: Invalid
