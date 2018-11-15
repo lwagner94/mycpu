@@ -46,6 +46,12 @@
   regs: 3
   op: 0
 
+- name: Compare
+  code: 0x16
+  keyword: cmp
+  regs: 2
+  op: 0
+
 - name: Or
   code: 0x20
   keyword: or

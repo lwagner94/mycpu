@@ -58,6 +58,12 @@ pub fn match_instruction(line: &TokenizedLine) -> Option<ParsedLine> {
             parse_register_name(line.tokens[2].token.as_str())?,
             parse_register_name(line.tokens[3].token.as_str())?,
             Op::Number(0)), 
+        "cmp" if line.tokens.len() == 3 => MatchedInstruction::new(
+            Instruction::Compare,
+            parse_register_name(line.tokens[1].token.as_str())?,
+            parse_register_name(line.tokens[2].token.as_str())?,
+            0,
+            Op::Number(0)), 
         "or" if line.tokens.len() == 4 => MatchedInstruction::new(
             Instruction::Or,
             parse_register_name(line.tokens[1].token.as_str())?,

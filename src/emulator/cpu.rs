@@ -31,6 +31,13 @@ pub enum Register {
     SR
 }
 
+#[derive(Debug)]
+pub enum StatusBit {
+    Zero = 0,
+    Negative = 1,
+    Carry = 2
+}
+
 pub struct CPU {
     pub regs: [Wrapping<u32>; 19],
     pub memory: AddressSpace,
@@ -39,6 +46,9 @@ pub struct CPU {
 }
 
 impl CPU {
+    // Status register:
+    // Carry, Zero, Negative,
+
     pub fn new(memory: AddressSpace) -> Self {
         let mut cpu = CPU {
             regs: [Wrapping(0u32); 19],
@@ -49,6 +59,28 @@ impl CPU {
 
         cpu.regs[Register::PC as usize] = Wrapping(MEMORY_START);
         cpu
+    }
+
+    fn set_status_bit(&mut self, bit: StatusBit, set: bool) {
+        let mut value = self.regs[Register::SR as usize].0;
+
+        let mask = 0x1u32 << bit as u32;
+
+        if set {
+            value |= mask;
+        }
+        else {
+            value &= !mask;
+        }
+
+        self.regs[Register::SR as usize] = Wrapping(value);
+    }
+
+    fn get_status_bit(&self, bit: StatusBit) -> bool {
+        let value = self.regs[Register::SR as usize].0;
+        let mask = 0x1u32 << bit as u32;
+
+        (value & mask) != 0
     }
 
     fn get_register(self: &Self, reg: Register) -> u32 {
@@ -100,6 +132,11 @@ impl CPU {
             Subtract => self.regs[reg_1] = self.regs[reg_2] - self.regs[reg_3],
             Multiply => self.regs[reg_1] = self.regs[reg_2] * self.regs[reg_3],
             Divide => self.regs[reg_1] = self.regs[reg_2] / self.regs[reg_3],
+            Compare => {
+                let l = self.regs[reg_1].0;
+                let r = self.regs[reg_2].0;
+                self.compare(l, r);
+            },
 
             And => self.regs[reg_1] = self.regs[reg_2] & self.regs[reg_3],
             Or => self.regs[reg_1] = self.regs[reg_2] | self.regs[reg_3],
@@ -145,6 +182,17 @@ impl CPU {
     fn halt(self: &mut Self) {
         eprintln!("Halting CPU at PC=0x{:X}", self.get_register(Register::PC));
         self.halt = true;
+    }
+
+    fn compare(&mut self, l: u32, r: u32) {
+        let left = Wrapping(l);
+        let right = Wrapping(r);
+        let result = left - right;
+
+        self.set_status_bit(StatusBit::Zero, result.0 == 0);
+        self.set_status_bit(StatusBit::Carry, right > left);
+
+        self.set_status_bit(StatusBit::Negative, (result & Wrapping(1 << 31)).0 != 0);
     }
 }
 
@@ -271,4 +319,53 @@ mod tests {
             Complement, 0, 0,0,0));
         assert_eq!(cpu.get_register(R0), 0b11111111_11111111_11111111_11111110);
     }
+
+    #[test]
+    fn test_compare_equal() {
+        let mut cpu = create_cpu();
+        cpu.set_register(R0, 10);
+        cpu.set_register(R1, 10);
+        cpu.execute_instruction(DecodedInstruction::new(
+            Compare, 0, 1, 0, 0));
+        assert!(cpu.get_status_bit(StatusBit::Zero));
+        assert!(!cpu.get_status_bit(StatusBit::Carry));
+        assert!(!cpu.get_status_bit(StatusBit::Negative));
+    }
+
+    #[test]
+    fn test_compare_negative_carry() {
+        let mut cpu = create_cpu();
+        cpu.set_register(R0, 10);
+        cpu.set_register(R1, 11);
+        cpu.execute_instruction(DecodedInstruction::new(
+            Compare, 0, 1, 0, 0));
+        assert!(!cpu.get_status_bit(StatusBit::Zero));
+        assert!(cpu.get_status_bit(StatusBit::Carry));
+        assert!(cpu.get_status_bit(StatusBit::Negative));
+    }
+
+    #[test]
+    fn test_compare_negative() {
+        let mut cpu = create_cpu();
+        cpu.set_register(R0, 0xfffffff6); // -10
+        cpu.set_register(R1, 11);
+        cpu.execute_instruction(DecodedInstruction::new(
+            Compare, 0, 1, 0, 0));
+        assert!(!cpu.get_status_bit(StatusBit::Zero));
+        assert!(!cpu.get_status_bit(StatusBit::Carry));
+        assert!(cpu.get_status_bit(StatusBit::Negative));
+    }
+
+    // TODO: Carry testcase?
+//    #[test]
+//    fn test_compare_carry() {
+//        let mut cpu = create_cpu();
+//        cpu.set_register(R0, 0x80000000); // -2147483648 most negative int
+//        cpu.set_register(R1, 5);
+//        cpu.execute_instruction(DecodedInstruction::new(
+//            Compare, 0, 1, 0, 0));
+//        assert!(!cpu.get_status_bit(StatusBit::Zero));
+//        assert!(cpu.get_status_bit(StatusBit::Carry));
+//        assert!(!cpu.get_status_bit(StatusBit::Negative));
+//    }
 }
