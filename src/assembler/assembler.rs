@@ -3,6 +3,7 @@ use std::io::BufReader;
 use std::io::Write;
 use std::collections::HashMap;
 
+use emulator::constants::*;
 use assembler::tokenizer;
 use assembler::parser::{parse, ParsedLine, Op};
 use common::encoding::DecodedInstruction;
@@ -18,7 +19,7 @@ pub fn assemble_file(path: &str) -> Option<Vec<u8>> {
 
 
     let mut lookup = HashMap::new();
-    let mut counter = 0u32;
+    let mut counter = MEMORY_START;
 
     // Build lookup table
     for instr in &parsed {

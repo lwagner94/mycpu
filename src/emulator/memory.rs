@@ -1,113 +1,159 @@
-pub struct Memory {
-    data: Vec<u8>
+use emulator::device::mainmemory::MainMemory;
+use emulator::device::consoleio::ConsoleIO;
+
+use emulator::constants::*;
+
+pub trait Memory {
+    fn read(&self, addr: u32) -> u8;
+    fn read_doubleword(&self, addr: u32) -> u32;
+    fn read_all(&self, addr: u32, number: u32) -> Vec<u8>;
+    fn write(&mut self, addr: u32, value: u8);
+    fn write_doubleword(&mut self, addr: u32, value: u32);
+    fn write_all(&mut self, bytes: &[u8], offset: u32);
+
+    fn size(&self) -> u32;
 }
 
-impl Memory {
-    pub fn new(size: u32) -> Self {
-        Memory {
-            data: vec![0; size as usize]
+pub fn check_alignment(addr: u32, align: u32) {
+    if addr % align != 0 {
+        panic!("Unaligned memory access at {:x}", addr);
+    }
+}
+
+pub fn address_to_index(addr: u32) -> usize {
+    (addr as usize)
+}
+
+pub fn read_doubleword<F>(read_func: F, addr: u32) -> u32 where F: Fn(u32) -> u8 {
+    check_alignment(addr, 4);
+    let b0 = read_func(addr) as u32;
+    let b1 = read_func(addr + 1) as u32;
+    let b2 = read_func(addr + 2) as u32;
+    let b3 = read_func(addr + 3) as u32;
+
+    b0 << 24 | b1 << 16 | b2 << 8 | b3
+}
+
+pub fn write_doubleword<F>(mut write_func: F, addr: u32, value: u32) where F: FnMut(u32, u8){
+    check_alignment(addr, 4);
+
+    write_func(addr, ((0xFF_00_00_00 & value) >> 24) as u8);
+    write_func(addr + 1, ((0x00_FF_00_00 & value) >> 16) as u8);
+    write_func(addr + 2, ((0x00_00_FF_00 & value) >> 8) as u8);
+    write_func(addr + 3, ((0x00_00_00_FF & value) >> 0) as u8);
+}
+
+struct MappedDevice {
+    start: u32,
+    end: u32,
+    device: Box<Memory>
+}
+
+pub struct AddressSpace {
+    devices: Vec<MappedDevice>
+}
+
+impl Memory for AddressSpace {
+    fn read(&self, addr: u32) -> u8 {
+        let device = self.device_for_address(addr);
+        device.device.read(addr - device.start)
+    }
+
+    fn read_doubleword(&self, addr: u32) -> u32 {
+        let device = self.device_for_address(addr);
+        device.device.read_doubleword(addr - device.start)
+    }
+
+    fn read_all(&self, addr: u32, number: u32) -> Vec<u8> {
+        let device = self.device_for_address(addr);
+        device.device.read_all(addr - device.start, number)
+    }
+
+    fn write(&mut self, addr: u32, value: u8) {
+        let device = self.device_for_address_mut(addr);
+        device.device.write(addr - device.start, value);
+    }
+
+    fn write_doubleword(&mut self, addr: u32, value: u32) {
+        let device = self.device_for_address_mut(addr);
+        device.device.write_doubleword(addr - device.start, value);
+    }
+
+    fn write_all(&mut self, bytes: &[u8], offset: u32) {
+        let device = self.device_for_address_mut(offset);
+        device.device.write_all(bytes, offset - device.start);
+    }
+
+    fn size(&self) -> u32 {
+        // 4 Gigabyte
+        0xFFFFFFFF
+    }
+}
+
+impl AddressSpace {
+    pub fn new() -> Self {
+        AddressSpace{
+            devices: Vec::new()
         }
     }
 
-    fn address_to_index(&self, addr: u32) -> usize {
-        (addr as usize)
+    pub fn default() -> Self {
+        let mut mem = AddressSpace::new();
+
+        let main_memory = Box::new(MainMemory::new(1024 * 1024));
+
+        // Map main memory at 1 Megabyte
+        // Memory space: 0x100000 - 0x1fffff
+        mem.map(main_memory, MEMORY_START);
+
+        // ConsoleIO: 8 bytes
+        let console_io = Box::new(ConsoleIO::new());
+
+        // Map at 512kByte
+        // Map it at 0x80000 - 0x80007
+        mem.map(console_io, 0x80000);
+
+        mem
     }
 
-    fn check_alignment(&self, addr: u32, align: u32) {
-        if addr % align != 0 {
-            panic!("Unaligned memory access at {:x}", addr);
+    pub fn map(&mut self, device: Box<Memory>, offset: u32) {
+        let size = device.size();
+
+        let start = offset;
+        let end = start + size - 1; // Inclusive
+
+        self.devices.push(MappedDevice {
+            start,
+            end,
+            device
+        });
+    }
+
+    fn device_for_address_mut(&mut self, addr: u32) -> &mut MappedDevice {
+        // TODO: Find out how to write this in idiomatic Rust code
+
+        let mut index = 0usize;
+
+        for i in 0..self.devices.len() {
+            if addr >= self.devices[i].start && addr <= self.devices[i].end {
+                index = i;
+            }
         }
+
+        &mut self.devices[index]
     }
 
-    pub fn read(&self, addr: u32) -> u8 {
-        self.data[self.address_to_index(addr)]
-    }
+    fn device_for_address(&self, addr: u32) -> &MappedDevice {
+        // TODO: Find out how to write this in idiomatic Rust code
 
-    pub fn read_instruction(&self, addr: u32) -> [u8; 8] {
-        self.check_alignment(addr, 8);
-        let index = self.address_to_index(addr);
-        let mut res = [0; 8];
-        res.copy_from_slice(&self.data[index..index + 8]);
-        res
-    }
+        let mut index = 0usize;
 
-    pub fn read_doubleword(&self, addr: u32) -> u32 {
-        self.check_alignment(addr, 4);
-        let b0 = self.read(addr) as u32;
-        let b1 = self.read(addr + 1) as u32;
-        let b2 = self.read(addr + 2) as u32;
-        let b3 = self.read(addr + 3) as u32;
+        for i in 0..self.devices.len() {
+            if addr >= self.devices[i].start && addr <= self.devices[i].end {
+                index = i;
+            }
+        }
 
-        b0 << 24 | b1 << 16 | b2 << 8 | b3
-    }
-
-    pub fn write(&mut self, addr: u32, value: u8) {
-        let index = self.address_to_index(addr);
-        self.data[index] = value;
-    }
-
-    pub fn write_all(&mut self, bytes: &[u8], offset: u32) {
-        let index = self.address_to_index(offset);
-        self.data[index..index + bytes.len()].copy_from_slice(bytes);
-    }
-
-    pub fn write_doubleword(&mut self, addr: u32, value: u32) {
-        self.check_alignment(addr, 4);
-
-        let bytes =
-            [((0xFF_00_00_00 & value) >> 24) as u8,
-            ((0x00_FF_00_00 & value) >> 16) as u8,
-            ((0x00_00_FF_00 & value) >> 8) as u8,
-            ((0x00_00_00_FF & value) >> 0) as u8];
-
-        self.write_all(&bytes, addr);
-    }
-
-
-}
-
-#[cfg(test)]
-mod tests {
-    use super::*;
-
-    #[test]
-    fn test_write() {
-        let mut mem = Memory::new(8);
-        mem.write(7, 10);
-        assert_eq!(mem.data, [0, 0, 0, 0, 0, 0, 0, 10]);
-    }
-
-    #[test]
-    fn test_write_doubleword() {
-        let mut mem = Memory::new(8);
-        mem.write_doubleword(4, 0xAABBCCDD);
-        assert_eq!(mem.data, [0, 0, 0, 0, 0xAA, 0xBB, 0xCC, 0xDD]);
-    }
-
-    #[test]
-    fn test_read_instruction() {
-        let mem = Memory {
-            data: vec![0, 0, 10, 20, 0, 0, 0, 0]
-        };
-        assert_eq!(mem.read_instruction(0), [0, 0, 10, 20, 0, 0, 0, 0]);
-    }
-
-    #[test]
-    fn test_read() {
-        let mem = Memory {
-            data: vec![0, 0, 0, 0, 0xAA, 0xBB, 0xCC, 0xDD]
-        };
-        assert_eq!(mem.read(4), 0xAA);
-        assert_eq!(mem.read(5), 0xBB);
-        assert_eq!(mem.read(6), 0xCC);
-        assert_eq!(mem.read(7), 0xDD);
-    }
-
-    #[test]
-    fn test_read_doubleword() {
-        let mem = Memory {
-            data: vec![0, 0, 0, 0, 0xAA, 0xBB, 0xCC, 0xDD]
-        };
-        assert_eq!(mem.read_doubleword(4), 0xAABBCCDD);
+        &self.devices[index]
     }
 }

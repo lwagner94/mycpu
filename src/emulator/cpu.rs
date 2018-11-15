@@ -3,7 +3,9 @@ use std::num::Wrapping;
 use common::encoding::DecodedInstruction;
 use common::generated::instruction::Instruction::{*};
 
-use emulator::memory::Memory;
+use emulator::constants::*;
+use emulator::memory::{Memory};
+use emulator::memory::AddressSpace;
 
 
 #[derive(Debug)]
@@ -31,19 +33,22 @@ pub enum Register {
 
 pub struct CPU {
     pub regs: [Wrapping<u32>; 19],
-    pub memory: Memory,
+    pub memory: AddressSpace,
     halt: bool,
     instruction: DecodedInstruction
 }
 
 impl CPU {
-    pub fn new(mem: Memory) -> Self {
-        CPU {
+    pub fn new(memory: AddressSpace) -> Self {
+        let mut cpu = CPU {
             regs: [Wrapping(0u32); 19],
-            memory: mem,
+            memory,
             halt: false,
             instruction: DecodedInstruction::invalid()
-        }
+        };
+
+        cpu.regs[Register::PC as usize] = Wrapping(MEMORY_START);
+        cpu
     }
 
     fn get_register(self: &Self, reg: Register) -> u32 {
@@ -55,7 +60,7 @@ impl CPU {
     }
 
     pub fn print_state(&self) {
-        println!("{:#?}", self.regs);
+        eprintln!("{:#?}", self.regs);
     }
 
     pub fn run(self: &mut Self) {
@@ -71,7 +76,12 @@ impl CPU {
     fn load_instruction(self: &mut Self) -> [u8; 8] {
         let pc = self.regs[Register::PC as usize].0;
         self.regs[Register::PC as usize] += Wrapping(8);
-        self.memory.read_instruction(pc)
+
+        let instruction_vec = self.memory.read_all(pc, 8);
+        let mut buffer = [0u8; 8];
+        buffer.copy_from_slice(&instruction_vec);
+
+        buffer
     }
 
     fn execute_instruction(self: &mut Self, d: DecodedInstruction) {
@@ -131,7 +141,7 @@ impl CPU {
     }
 
     fn halt(self: &mut Self) {
-        println!("Halting CPU at PC=0x{:X}", self.get_register(Register::PC));
+        eprintln!("Halting CPU at PC=0x{:X}", self.get_register(Register::PC));
         self.halt = true;
     }
 }
@@ -142,7 +152,9 @@ mod tests {
     use super::Register::*;
 
     fn create_cpu() -> CPU {
-        CPU::new(Memory::new(1024))
+        let addr_space = AddressSpace::default();
+
+        CPU::new(addr_space)
     }
 
     fn cpu_arith_prep() -> CPU {

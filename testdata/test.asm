@@ -1,11 +1,4 @@
-ldi sp, 0x100
-ldi r0, 10
-call foo
-jmp end
-foo:
-ldi r1, 10
-push r1
-pop r2
-ret
-end:
+ldi sp, 0x1ffffc
+ldi r0, 1090519040
+st r0, 0x80000
 halt
