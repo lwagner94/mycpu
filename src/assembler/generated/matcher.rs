@@ -100,8 +100,20 @@ pub fn match_instruction(line: &TokenizedLine) -> Option<ParsedLine> {
             0,
             0,
             parse_operand(line.tokens[2].token.as_str())?), 
+        "ldb" if line.tokens.len() == 3 => MatchedInstruction::new(
+            Instruction::LoadByte,
+            parse_register_name(line.tokens[1].token.as_str())?,
+            0,
+            0,
+            parse_operand(line.tokens[2].token.as_str())?), 
         "st" if line.tokens.len() == 3 => MatchedInstruction::new(
             Instruction::Store,
+            parse_register_name(line.tokens[1].token.as_str())?,
+            0,
+            0,
+            parse_operand(line.tokens[2].token.as_str())?), 
+        "stb" if line.tokens.len() == 3 => MatchedInstruction::new(
+            Instruction::StoreByte,
             parse_register_name(line.tokens[1].token.as_str())?,
             0,
             0,

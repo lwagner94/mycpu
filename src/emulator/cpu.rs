@@ -109,7 +109,9 @@ impl CPU {
 
             LoadImmediate => self.regs[reg_1] = Wrapping(d.operand),
             Load => self.regs[reg_1] = Wrapping(self.memory.read_doubleword(d.operand)),
+            LoadByte => self.regs[reg_1] = Wrapping(self.memory.read(d.operand) as u32),
             Store => self.memory.write_doubleword(d.operand, self.regs[reg_1].0),
+            StoreByte => self.memory.write(d.operand, self.regs[reg_1].0 as u8),
             Push => self.push(reg_1),
             Pop => self.pop(reg_1),
 

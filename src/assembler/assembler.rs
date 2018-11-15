@@ -33,8 +33,6 @@ pub fn assemble_file(path: &str) -> Option<Vec<u8>> {
         }
     }
 
-    println!("{:#?}", lookup);
-
 
     let mut bytes = Vec::new();
 

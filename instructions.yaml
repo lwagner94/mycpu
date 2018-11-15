@@ -88,21 +88,33 @@
   regs: 1
   op: 1
 
-- name: Store
+- name: LoadByte
   code: 0x32
+  keyword: ldb
+  regs: 1
+  op: 1
+
+- name: Store
+  code: 0x33
   keyword: st
+  regs: 1
+  op: 1
+
+- name: StoreByte
+  code: 0x34
+  keyword: stb
   regs: 1
   op: 1
 
 
 - name: Push
-  code: 0x33
+  code: 0x35
   keyword: push
   regs: 1
   op: 0
 
 - name: Pop
-  code: 0x34
+  code: 0x36
   keyword: pop
   regs: 1
   op: 0
