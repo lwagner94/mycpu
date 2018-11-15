@@ -42,7 +42,8 @@ pub struct CPU {
     pub regs: [Wrapping<u32>; 19],
     pub memory: AddressSpace,
     halt: bool,
-    instruction: DecodedInstruction
+    instruction: DecodedInstruction,
+    pub cycle_counter: u64
 }
 
 impl CPU {
@@ -54,7 +55,8 @@ impl CPU {
             regs: [Wrapping(0u32); 19],
             memory,
             halt: false,
-            instruction: DecodedInstruction::invalid()
+            instruction: DecodedInstruction::invalid(),
+            cycle_counter: 0
         };
 
         cpu.regs[Register::PC as usize] = Wrapping(MEMORY_START);
@@ -102,6 +104,7 @@ impl CPU {
         while !self.halt {
             let instruction = self.load_instruction();
             let decoded_instruction = DecodedInstruction::decode(&instruction);
+            self.cycle_counter += 1;
             self.execute_instruction(decoded_instruction);
         }
     }
