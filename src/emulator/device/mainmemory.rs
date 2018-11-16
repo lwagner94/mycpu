@@ -39,12 +39,10 @@ impl Memory for MainMemory {
         self.data[index..index + bytes.len()].copy_from_slice(bytes);
     }
 
-    fn read_instruction(&self, addr: u32) -> [u8; 8] {
+    fn read_instruction(&self, addr: u32) -> &[u8] {
         check_alignment(addr, 8);
         let index = address_to_index(addr - self.offset);
-        let mut bytes = [0u8; 8];
-        bytes.copy_from_slice(&self.data[index..index + 8]);
-        bytes
+        &self.data[index..index + 8]
     }
 
     fn size(&self) -> u32 {

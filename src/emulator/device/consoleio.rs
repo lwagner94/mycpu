@@ -36,7 +36,7 @@ impl Memory for ConsoleIO {
         unimplemented!();
     }
 
-    fn read_instruction(&self, _addr: u32) -> [u8; 8] {
+    fn read_instruction(&self, _addr: u32) -> &[u8] {
         unimplemented!()
     }
 

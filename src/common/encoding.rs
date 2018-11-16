@@ -33,7 +33,7 @@ impl DecodedInstruction {
         DecodedInstruction::new(Instruction::Invalid, 0, 0, 0, 0)
     }
 
-    pub fn decode(instruction: [u8; 8]) -> Self {
+    pub fn decode(instruction: &[u8]) -> Self {
         let instruction_type = Instruction::from(instruction[0]);
 
         DecodedInstruction::new(
@@ -48,6 +48,7 @@ impl DecodedInstruction {
                 instruction[7],
             ),
         )
+
     }
 
     pub fn encode(self) -> [u8; 8] {

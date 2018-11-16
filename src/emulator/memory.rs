@@ -11,7 +11,7 @@ pub trait Memory {
     fn write_doubleword(&mut self, addr: u32, value: u32);
     fn write_all(&mut self, bytes: &[u8], offset: u32);
 
-    fn read_instruction(&self, addr: u32) -> [u8; 8];
+    fn read_instruction(&self, addr: u32) -> &[u8];
 
     fn size(&self) -> u32;
 }
@@ -87,7 +87,7 @@ impl Memory for AddressSpace {
         device.write_all(bytes, addr);
     }
 
-    fn read_instruction(&self, addr: u32) -> [u8; 8] {
+    fn read_instruction(&self, addr: u32) -> &[u8] {
         self.memory.read_instruction(addr)
     }
 

@@ -2,7 +2,6 @@ use std::num::Wrapping;
 
 use crate::common::encoding::DecodedInstruction;
 use crate::common::generated::instruction::Instruction::*;
-
 use crate::emulator::constants::*;
 use crate::emulator::memory::AddressSpace;
 use crate::emulator::memory::Memory;
@@ -106,7 +105,7 @@ impl CPU {
         }
     }
 
-    fn load_instruction(self: &mut Self) -> [u8; 8] {
+    fn load_instruction(self: &mut Self) -> &[u8] {
         let pc = self.regs[Register::PC as usize].0;
         self.regs[Register::PC as usize] += Wrapping(8);
 
