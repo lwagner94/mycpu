@@ -1,6 +1,6 @@
-use common::generated::instruction::Instruction;
-use assembler::tokenizer::TokenizedLine;
-use assembler::parser::{*};
+use crate::common::generated::instruction::Instruction;
+use crate::assembler::tokenizer::TokenizedLine;
+use crate::assembler::parser::{*};
 
 pub fn match_instruction(line: &TokenizedLine) -> Option<ParsedLine> {
     if line.tokens.len() == 0 {

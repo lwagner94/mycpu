@@ -1,4 +1,4 @@
-use emulator::memory::{Memory, read_doubleword, write_doubleword, check_alignment, address_to_index};
+use crate::emulator::memory::{Memory, read_doubleword, write_doubleword, check_alignment, address_to_index};
 
 pub struct MainMemory {
     data: Vec<u8>,

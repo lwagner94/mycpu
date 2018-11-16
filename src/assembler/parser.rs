@@ -1,7 +1,7 @@
-use assembler::tokenizer::TokenizedLine;
-use assembler::generated::matcher;
 use std::str::FromStr;
-use common::generated::instruction::Instruction;
+use crate::assembler::tokenizer::TokenizedLine;
+use crate::assembler::generated::matcher;
+use crate::common::generated::instruction::Instruction;
 
 #[derive(Debug)]
 pub enum ParsedLine {

@@ -1,4 +1,4 @@
-use emulator::memory::*;
+use crate::emulator::memory::*;
 
 
 pub struct ConsoleIO {

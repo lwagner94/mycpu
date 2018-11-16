@@ -1,7 +1,7 @@
-use emulator::device::mainmemory::MainMemory;
-use emulator::device::consoleio::ConsoleIO;
+use crate::emulator::device::mainmemory::MainMemory;
+use crate::emulator::device::consoleio::ConsoleIO;
 
-use emulator::constants::*;
+use crate::emulator::constants::*;
 
 pub trait Memory {
     fn read(&self, addr: u32) -> u8;

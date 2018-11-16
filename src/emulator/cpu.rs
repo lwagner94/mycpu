@@ -1,11 +1,11 @@
 use std::num::Wrapping;
 
-use common::encoding::DecodedInstruction;
-use common::generated::instruction::Instruction::{*};
+use crate::common::encoding::DecodedInstruction;
+use crate::common::generated::instruction::Instruction::{*};
 
-use emulator::constants::*;
-use emulator::memory::{Memory};
-use emulator::memory::AddressSpace;
+use crate::emulator::constants::*;
+use crate::emulator::memory::{Memory};
+use crate::emulator::memory::AddressSpace;
 
 
 #[derive(Debug)]
