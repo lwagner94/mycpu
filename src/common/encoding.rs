@@ -1,6 +1,7 @@
 use byteorder::{BigEndian, WriteBytesExt};
 
-use super::super::common::generated::instruction::Instruction;
+use crate::common::generated::instruction::Instruction;
+use crate::common::util;
 
 #[derive(Debug)]
 pub struct DecodedInstruction {
@@ -35,19 +36,17 @@ impl DecodedInstruction {
     pub fn decode(instruction: [u8; 8]) -> Self {
         let instruction_type = Instruction::from(instruction[0]);
 
-        let b0 = u32::from(instruction[4]);
-        let b1 = u32::from(instruction[5]);
-        let b2 = u32::from(instruction[6]);
-        let b3 = u32::from(instruction[7]);
-
-        let operand = b0 << 24 | b1 << 16 | b2 << 8 | b3;
-
         DecodedInstruction::new(
             instruction_type,
             instruction[1],
             instruction[2],
             instruction[3],
-            operand,
+            util::bytes_to_u32(
+                instruction[4],
+                instruction[5],
+                instruction[6],
+                instruction[7],
+            ),
         )
     }
 

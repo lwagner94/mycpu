@@ -1,7 +1,7 @@
+use crate::common::util;
+use crate::emulator::constants::*;
 use crate::emulator::device::consoleio::ConsoleIO;
 use crate::emulator::device::mainmemory::MainMemory;
-
-use crate::emulator::constants::*;
 
 pub trait Memory {
     fn read(&self, addr: u32) -> u8;
@@ -31,12 +31,12 @@ where
     F: Fn(u32) -> u8,
 {
     check_alignment(addr, 4);
-    let b0 = u32::from(read_func(addr));
-    let b1 = u32::from(read_func(addr + 1));
-    let b2 = u32::from(read_func(addr + 2));
-    let b3 = u32::from(read_func(addr + 3));
-
-    b0 << 24 | b1 << 16 | b2 << 8 | b3
+    util::bytes_to_u32(
+        read_func(addr),
+        read_func(addr + 1),
+        read_func(addr + 2),
+        read_func(addr + 3),
+    )
 }
 
 pub fn write_doubleword<F>(mut write_func: F, addr: u32, value: u32)
