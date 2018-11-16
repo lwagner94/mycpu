@@ -1,7 +1,9 @@
 use crate::emulator::memory::*;
 
 #[derive(Default)]
-pub struct ConsoleIO {}
+pub struct ConsoleIO {
+    offset: u32,
+}
 
 impl Memory for ConsoleIO {
     fn read(&self, _addr: u32) -> u8 {
@@ -19,7 +21,7 @@ impl Memory for ConsoleIO {
     }
 
     fn write(&mut self, addr: u32, value: u8) {
-        match addr {
+        match addr - self.offset {
             0 => print!("{}", value as char),
             _ => panic!("ConsoleIO: Invalid memory access at offset 0x{:X}", addr),
         }
@@ -27,7 +29,7 @@ impl Memory for ConsoleIO {
 
     fn write_doubleword(&mut self, addr: u32, value: u32) {
         let byte = ((value & 0xFF_00_00_00) >> 24) as u8;
-        self.write(addr, byte);
+        self.write(addr - self.offset, byte);
     }
 
     fn write_all(&mut self, _bytes: &[u8], _offset: u32) {
@@ -40,5 +42,13 @@ impl Memory for ConsoleIO {
 
     fn size(&self) -> u32 {
         8
+    }
+}
+
+impl ConsoleIO {
+    pub fn new(offset: u32) -> Self {
+        ConsoleIO {
+            offset
+        }
     }
 }

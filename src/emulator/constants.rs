@@ -1,1 +1,7 @@
+pub const MEMORY_SIZE: u32 = 1024 * 1024;
 pub const MEMORY_START: u32 = 0x10_0000;
+pub const MEMORY_END: u32 = MEMORY_START + MEMORY_SIZE - 1;
+
+pub const CONSOLEIO_SIZE: u32 = 8;
+pub const CONSOLEIO_START: u32 = 0x8_000;
+pub const CONSOLEIO_END: u32 = CONSOLEIO_START + CONSOLEIO_SIZE - 1;

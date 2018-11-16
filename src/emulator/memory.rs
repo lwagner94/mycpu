@@ -51,52 +51,44 @@ where
     write_func(addr + 3, (0x00_00_00_FF & value) as u8);
 }
 
-struct MappedDevice {
-    start: u32,
-    end: u32,
-    device: Box<Memory>,
-}
-
 pub struct AddressSpace {
-    devices: Vec<MappedDevice>,
+    memory: MainMemory,
+    console: ConsoleIO,
 }
 
 impl Memory for AddressSpace {
     fn read(&self, addr: u32) -> u8 {
         let device = self.device_for_address(addr);
-        device.device.read(addr - device.start)
+        device.read(addr)
     }
 
     fn read_doubleword(&self, addr: u32) -> u32 {
         let device = self.device_for_address(addr);
-        device.device.read_doubleword(addr - device.start)
+        device.read_doubleword(addr)
     }
 
     fn read_all(&self, addr: u32, number: u32) -> Vec<u8> {
         let device = self.device_for_address(addr);
-        device.device.read_all(addr - device.start, number)
+        device.read_all(addr, number)
     }
 
     fn write(&mut self, addr: u32, value: u8) {
         let device = self.device_for_address_mut(addr);
-        device.device.write(addr - device.start, value);
+        device.write(addr, value);
     }
 
     fn write_doubleword(&mut self, addr: u32, value: u32) {
         let device = self.device_for_address_mut(addr);
-        device.device.write_doubleword(addr - device.start, value);
+        device.write_doubleword(addr, value);
     }
 
-    fn write_all(&mut self, bytes: &[u8], offset: u32) {
-        let device = self.device_for_address_mut(offset);
-        device.device.write_all(bytes, offset - device.start);
+    fn write_all(&mut self, bytes: &[u8], addr: u32) {
+        let device = self.device_for_address_mut(addr);
+        device.write_all(bytes, addr);
     }
 
     fn read_instruction(&self, addr: u32) -> [u8; 8] {
-        //        let device = self.device_for_address(addr);
-        // Optimization
-        let device = &self.devices[0];
-        device.device.read_instruction(addr - device.start)
+        self.memory.read_instruction(addr)
     }
 
     fn size(&self) -> u32 {
@@ -107,62 +99,31 @@ impl Memory for AddressSpace {
 
 impl Default for AddressSpace {
     fn default() -> Self {
-        let mut mem = AddressSpace {
-            devices: Vec::new(),
-        };
-
-        let main_memory = Box::new(MainMemory::new(1024 * 1024));
-
-        // Map main memory at 1 Megabyte
-        // Memory space: 0x100000 - 0x1fffff
-        mem.map(main_memory, MEMORY_START);
-
-        // ConsoleIO: 8 bytes
-        let console_io = Box::new(ConsoleIO::default());
-
-        // Map at 512kByte
-        // Map it at 0x80000 - 0x80007
-        mem.map(console_io, 0x80000);
-
-        mem
+        AddressSpace {
+            memory: MainMemory::new(MEMORY_START, MEMORY_SIZE),
+            console: ConsoleIO::new(CONSOLEIO_START)
+        }
     }
 }
 
 impl AddressSpace {
-    pub fn map(&mut self, device: Box<Memory>, offset: u32) {
-        let size = device.size();
+    fn device_for_address(&self, addr: u32) -> &Memory {
 
-        let start = offset;
-        let end = start + size - 1; // Inclusive
-
-        self.devices.push(MappedDevice { start, end, device });
-    }
-
-    fn device_for_address_mut(&mut self, addr: u32) -> &mut MappedDevice {
-        // TODO: Find out how to write this in idiomatic Rust code
-
-        let mut index = 0usize;
-
-        for i in 0..self.devices.len() {
-            if addr >= self.devices[i].start && addr <= self.devices[i].end {
-                index = i;
-            }
+        match addr {
+            MEMORY_START...MEMORY_END => &self.memory,
+            CONSOLEIO_START...CONSOLEIO_END => &self.console,
+            _ => panic!("Invalid memory access add 0x{:X}")
         }
 
-        &mut self.devices[index]
     }
 
-    fn device_for_address(&self, addr: u32) -> &MappedDevice {
-        // TODO: Find out how to write this in idiomatic Rust code
+    fn device_for_address_mut(&mut self, addr: u32) -> &mut Memory {
 
-        let mut index = 0usize;
-
-        for i in 0..self.devices.len() {
-            if addr >= self.devices[i].start && addr <= self.devices[i].end {
-                index = i;
-            }
+        match addr {
+            MEMORY_START...MEMORY_END => &mut self.memory,
+            CONSOLEIO_START...CONSOLEIO_END => &mut self.console,
+            _ => panic!("Invalid memory access add 0x{:X}")
         }
 
-        &self.devices[index]
     }
 }

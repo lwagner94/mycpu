@@ -7,3 +7,5 @@
 
 #/src/assembler/generated/*
 #!/src/assembler/generated/mod.rs
+callgrind*
+perf.data*
