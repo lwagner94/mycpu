@@ -1,6 +1,5 @@
 use std::io::BufRead;
 
-
 #[derive(Debug, PartialOrd, PartialEq)]
 pub struct Line {
     pub line_number: usize,
@@ -10,19 +9,19 @@ pub struct Line {
 #[derive(Debug)]
 pub struct Token {
     pub token: String,
-    pub position: usize
+    pub position: usize,
 }
 
 #[derive(Debug)]
 pub struct TokenizedLine {
     pub line: Line,
-    pub tokens: Vec<Token>
+    pub tokens: Vec<Token>,
 }
 
 fn strip_comments(line: String) -> String {
     match line.find("//") {
         Some(location) => line[..location].into(),
-        None => line
+        None => line,
     }
 }
 
@@ -38,10 +37,7 @@ fn split_lines(reader: &mut BufRead) -> Vec<Line> {
 
         line_number += 1;
 
-        result.push(Line {
-            line_number,
-            text
-        })
+        result.push(Line { line_number, text })
     }
 
     result
@@ -49,10 +45,13 @@ fn split_lines(reader: &mut BufRead) -> Vec<Line> {
 
 fn tokenize_line(text: &str) -> Vec<Token> {
     let replaced = text.replace(",", " ");
-    replaced.split_whitespace().map(|s| Token {
-        token: s.into(),
-        position: 0,
-    }).collect()
+    replaced
+        .split_whitespace()
+        .map(|s| Token {
+            token: s.into(),
+            position: 0,
+        })
+        .collect()
 }
 
 pub fn tokenize(reader: &mut BufRead) -> Vec<TokenizedLine> {
@@ -67,15 +66,11 @@ pub fn tokenize(reader: &mut BufRead) -> Vec<TokenizedLine> {
         }
         let tokens: Vec<Token> = tokenize_line(&text);
 
-        tokenized_lines.push(TokenizedLine {
-            line,
-            tokens
-        })
+        tokenized_lines.push(TokenizedLine { line, tokens })
     }
 
     tokenized_lines
 }
-
 
 #[cfg(test)]
 mod tests {
@@ -111,18 +106,22 @@ mod tests {
         let mut s = Cursor::new("abc\n\nghi");
         let res = split_lines(&mut s);
 
-        assert_eq!(res, vec![
-            Line {
-                line_number: 1,
-                text: "abc".into()
-            },
-            Line {
-                line_number: 2,
-                text: "".into()
-            },
-            Line {
-                line_number: 3,
-                text: "ghi".into()
-            }]);
+        assert_eq!(
+            res,
+            vec![
+                Line {
+                    line_number: 1,
+                    text: "abc".into()
+                },
+                Line {
+                    line_number: 2,
+                    text: "".into()
+                },
+                Line {
+                    line_number: 3,
+                    text: "ghi".into()
+                }
+            ]
+        );
     }
 }

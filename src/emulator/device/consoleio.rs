@@ -1,8 +1,7 @@
 use crate::emulator::memory::*;
 
 #[derive(Default)]
-pub struct ConsoleIO {
-}
+pub struct ConsoleIO {}
 
 impl Memory for ConsoleIO {
     fn read(&self, _addr: u32) -> u8 {
@@ -22,8 +21,7 @@ impl Memory for ConsoleIO {
     fn write(&mut self, addr: u32, value: u8) {
         match addr {
             0 => print!("{}", value as char),
-            _ => panic!("ConsoleIO: Invalid memory access at offset 0x{:X}",
-                        addr)
+            _ => panic!("ConsoleIO: Invalid memory access at offset 0x{:X}", addr),
         }
     }
 
@@ -39,7 +37,6 @@ impl Memory for ConsoleIO {
     fn read_instruction(&self, _addr: u32) -> [u8; 8] {
         unimplemented!()
     }
-
 
     fn size(&self) -> u32 {
         8

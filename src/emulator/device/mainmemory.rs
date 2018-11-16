@@ -1,4 +1,6 @@
-use crate::emulator::memory::{Memory, read_doubleword, write_doubleword, check_alignment, address_to_index};
+use crate::emulator::memory::{
+    address_to_index, check_alignment, read_doubleword, write_doubleword, Memory,
+};
 
 pub struct MainMemory {
     data: Vec<u8>,
@@ -51,7 +53,7 @@ impl Memory for MainMemory {
 impl MainMemory {
     pub fn new(size: u32) -> Self {
         MainMemory {
-            data: vec![0; size as usize]
+            data: vec![0; size as usize],
         }
     }
 }
@@ -77,7 +79,7 @@ mod tests {
     #[test]
     fn test_read_instruction() {
         let mem = MainMemory {
-            data: vec![0, 0, 10, 20, 0, 0, 0, 0]
+            data: vec![0, 0, 10, 20, 0, 0, 0, 0],
         };
         assert_eq!(mem.read_all(0, 8), vec![0, 0, 10, 20, 0, 0, 0, 0]);
     }
@@ -85,7 +87,7 @@ mod tests {
     #[test]
     fn test_read() {
         let mem = MainMemory {
-            data: vec![0, 0, 0, 0, 0xAA, 0xBB, 0xCC, 0xDD]
+            data: vec![0, 0, 0, 0, 0xAA, 0xBB, 0xCC, 0xDD],
         };
         assert_eq!(mem.read(4), 0xAA);
         assert_eq!(mem.read(5), 0xBB);
@@ -96,7 +98,7 @@ mod tests {
     #[test]
     fn test_read_doubleword() {
         let mem = MainMemory {
-            data: vec![0, 0, 0, 0, 0xAA, 0xBB, 0xCC, 0xDD]
+            data: vec![0, 0, 0, 0, 0xAA, 0xBB, 0xCC, 0xDD],
         };
         assert_eq!(mem.read_doubleword(4), 0xAABBCCDD);
     }

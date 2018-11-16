@@ -1,0 +1,5 @@
+edition = "2018"
+ignore = [
+    "src/common/generated",
+    "src/assembler/generated",
+]

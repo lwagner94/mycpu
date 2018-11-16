@@ -1,2 +1,2 @@
-pub mod generated;
 pub mod encoding;
+pub mod generated;

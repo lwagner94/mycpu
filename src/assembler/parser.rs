@@ -1,20 +1,19 @@
-use std::str::FromStr;
-use crate::assembler::tokenizer::TokenizedLine;
 use crate::assembler::generated::matcher;
+use crate::assembler::tokenizer::TokenizedLine;
 use crate::common::generated::instruction::Instruction;
+use std::str::FromStr;
 
 #[derive(Debug)]
 pub enum ParsedLine {
     Instruction(MatchedInstruction),
-    Label(String)
+    Label(String),
 }
 
 #[derive(Debug)]
 pub enum Op {
     Number(u32),
-    Label(String)
+    Label(String),
 }
-
 
 #[derive(Debug)]
 pub struct MatchedInstruction {
@@ -22,9 +21,8 @@ pub struct MatchedInstruction {
     pub reg1: u8,
     pub reg2: u8,
     pub reg3: u8,
-    pub op: Op
+    pub op: Op,
 }
-
 
 impl MatchedInstruction {
     pub fn new(instruction: Instruction, reg1: u8, reg2: u8, reg3: u8, op: Op) -> Self {
@@ -33,7 +31,7 @@ impl MatchedInstruction {
             reg1,
             reg2,
             reg3,
-            op
+            op,
         }
     }
 }
@@ -59,7 +57,7 @@ pub fn parse_register_name(name: &str) -> Option<u8> {
         "pc" => Some(16),
         "sp" => Some(17),
         "sr" => Some(18),
-        _ => None
+        _ => None,
     }
 }
 
@@ -67,32 +65,27 @@ pub fn parse_numeric_literal(literal: &str) -> Option<u32> {
     if literal.starts_with("0x") {
         let without_prefix = literal.trim_left_matches("0x");
         u32::from_str_radix(without_prefix, 16).ok()
+    } else {
+        u32::from_str(literal).ok()
     }
-        else {
-            u32::from_str(literal).ok()
-        }
 }
 
 pub fn parse_operand(s: &str) -> Option<Op> {
     if let Some(number) = parse_numeric_literal(s) {
         Some(Op::Number(number))
+    } else {
+        Some(Op::Label(s.into()))
     }
-        else {
-            Some(Op::Label(s.into()))
-        }
 }
-
 
 pub fn parse_label(token: &TokenizedLine) -> Option<ParsedLine> {
     if token.tokens.len() == 1 && token.tokens[0].token.ends_with(':') {
         let label = token.tokens[0].token.replace(':', "");
         Some(ParsedLine::Label(label))
-    }
-    else {
+    } else {
         None
     }
 }
-
 
 pub fn parse(tokens: Vec<TokenizedLine>) -> Option<Vec<ParsedLine>> {
     let mut parsed_instructions = Vec::new();
@@ -100,15 +93,12 @@ pub fn parse(tokens: Vec<TokenizedLine>) -> Option<Vec<ParsedLine>> {
     for token in tokens {
         if let Some(instr) = parse_label(&token) {
             parsed_instructions.push(instr);
-        }
-        else if let Some(instr) = matcher::match_instruction(&token) {
+        } else if let Some(instr) = matcher::match_instruction(&token) {
             parsed_instructions.push(instr);
-        }
-        else {
+        } else {
             return None;
         }
     }
 
     Some(parsed_instructions)
 }
-

@@ -1,5 +1,5 @@
-use crate::emulator::device::mainmemory::MainMemory;
 use crate::emulator::device::consoleio::ConsoleIO;
+use crate::emulator::device::mainmemory::MainMemory;
 
 use crate::emulator::constants::*;
 
@@ -26,7 +26,10 @@ pub fn address_to_index(addr: u32) -> usize {
     (addr as usize)
 }
 
-pub fn read_doubleword<F>(read_func: F, addr: u32) -> u32 where F: Fn(u32) -> u8 {
+pub fn read_doubleword<F>(read_func: F, addr: u32) -> u32
+where
+    F: Fn(u32) -> u8,
+{
     check_alignment(addr, 4);
     let b0 = u32::from(read_func(addr));
     let b1 = u32::from(read_func(addr + 1));
@@ -36,7 +39,10 @@ pub fn read_doubleword<F>(read_func: F, addr: u32) -> u32 where F: Fn(u32) -> u8
     b0 << 24 | b1 << 16 | b2 << 8 | b3
 }
 
-pub fn write_doubleword<F>(mut write_func: F, addr: u32, value: u32) where F: FnMut(u32, u8){
+pub fn write_doubleword<F>(mut write_func: F, addr: u32, value: u32)
+where
+    F: FnMut(u32, u8),
+{
     check_alignment(addr, 4);
 
     write_func(addr, ((0xFF_00_00_00 & value) >> 24) as u8);
@@ -48,11 +54,11 @@ pub fn write_doubleword<F>(mut write_func: F, addr: u32, value: u32) where F: Fn
 struct MappedDevice {
     start: u32,
     end: u32,
-    device: Box<Memory>
+    device: Box<Memory>,
 }
 
 pub struct AddressSpace {
-    devices: Vec<MappedDevice>
+    devices: Vec<MappedDevice>,
 }
 
 impl Memory for AddressSpace {
@@ -87,7 +93,7 @@ impl Memory for AddressSpace {
     }
 
     fn read_instruction(&self, addr: u32) -> [u8; 8] {
-//        let device = self.device_for_address(addr);
+        //        let device = self.device_for_address(addr);
         // Optimization
         let device = &self.devices[0];
         device.device.read_instruction(addr - device.start)
@@ -101,8 +107,8 @@ impl Memory for AddressSpace {
 
 impl Default for AddressSpace {
     fn default() -> Self {
-        let mut mem = AddressSpace{
-            devices: Vec::new()
+        let mut mem = AddressSpace {
+            devices: Vec::new(),
         };
 
         let main_memory = Box::new(MainMemory::new(1024 * 1024));
@@ -129,11 +135,7 @@ impl AddressSpace {
         let start = offset;
         let end = start + size - 1; // Inclusive
 
-        self.devices.push(MappedDevice {
-            start,
-            end,
-            device
-        });
+        self.devices.push(MappedDevice { start, end, device });
     }
 
     fn device_for_address_mut(&mut self, addr: u32) -> &mut MappedDevice {
