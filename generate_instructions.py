@@ -4,7 +4,9 @@ import yaml
 
 TEMPLATE = """
 // AUTOMATICALLY GENERATED, DO NOT EDIT!
+use std::mem::transmute;
 
+#[repr(u8)]
 #[derive(Debug, Clone)]
 pub enum Instruction {
 $instr
@@ -12,18 +14,13 @@ $instr
 
 impl Into<u8> for Instruction {
     fn into(self: Self) -> u8 {
-        match self {
-$instr_to_code
-        }
+        self as u8
     }
 }
 
 impl From<u8> for Instruction {
     fn from(value: u8) -> Instruction {
-        match value {
-$code_to_instr
-            _ => Instruction::Invalid
-        }
+        unsafe {transmute(value)}
     }
 }
 """
@@ -42,10 +39,6 @@ if __name__ == "__main__":
         code = hex(instruction["code"])
 
         instr += f"    {name},\n"
-
-        instr_to_code += f"            Instruction::{name} => {code},\n"
-
-        code_to_instr += f"            {code} => Instruction::{name},\n"
 
     t = Template(TEMPLATE)
 

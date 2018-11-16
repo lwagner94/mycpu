@@ -26,5 +26,5 @@ fn main() {
 
     let elapsed = after.duration_since(before).unwrap().as_secs();
     eprintln!("Executed {} instructions in {:?} seconds", cpu.cycle_counter, elapsed);
-
+    eprintln!("Frequency: {} MHz", cpu.cycle_counter as f64 / elapsed as f64/ 1000.0 / 1000.0);
 }

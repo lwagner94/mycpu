@@ -29,9 +29,13 @@ impl DecodedInstruction {
 
     pub fn decode(instruction: &[u8; 8]) -> Self {
         let instruction_type = Instruction::from(instruction[0]);
+        
+        let b0 = instruction[4] as u32;
+        let b1 = instruction[5] as u32;
+        let b2 = instruction[6] as u32;
+        let b3 = instruction[7] as u32;
 
-        let mut operand_reader = Cursor::new(&instruction[4..=7]);
-        let operand = operand_reader.read_u32::<BigEndian>().unwrap();
+        let operand = b0 << 24 | b1 << 16 | b2 << 8 | b3;
 
         DecodedInstruction::new(instruction_type, instruction[1], instruction[2], instruction[3], operand)
     }

@@ -113,9 +113,7 @@ impl CPU {
         let pc = self.regs[Register::PC as usize].0;
         self.regs[Register::PC as usize] += Wrapping(8);
 
-        let instruction_vec = self.memory.read_all(pc, 8);
-        let mut buffer = [0u8; 8];
-        buffer.copy_from_slice(&instruction_vec);
+        let buffer = self.memory.read_instruction(pc);
 
         buffer
     }

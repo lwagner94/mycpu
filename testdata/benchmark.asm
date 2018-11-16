@@ -1,6 +1,6 @@
 ldi sp, 0x1ffffc // Setup stack
 
-ldi r0, 10000
+ldi r0, 10000000
 
 loop2:
 cmpi r0, 0

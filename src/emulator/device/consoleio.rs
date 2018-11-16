@@ -36,6 +36,11 @@ impl Memory for ConsoleIO {
         unimplemented!();
     }
 
+    fn read_instruction(&self, addr: u32) -> [u8; 8] {
+        unimplemented!()
+    }
+
+
     fn size(&self) -> u32 {
         8
     }

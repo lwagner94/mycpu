@@ -11,6 +11,8 @@ pub trait Memory {
     fn write_doubleword(&mut self, addr: u32, value: u32);
     fn write_all(&mut self, bytes: &[u8], offset: u32);
 
+    fn read_instruction(&self, addr: u32) -> [u8; 8];
+
     fn size(&self) -> u32;
 }
 
@@ -82,6 +84,13 @@ impl Memory for AddressSpace {
     fn write_all(&mut self, bytes: &[u8], offset: u32) {
         let device = self.device_for_address_mut(offset);
         device.device.write_all(bytes, offset - device.start);
+    }
+
+    fn read_instruction(&self, addr: u32) -> [u8; 8] {
+//        let device = self.device_for_address(addr);
+        // Optimization
+        let device = &self.devices[0];
+        device.device.read_instruction(addr - device.start)
     }
 
     fn size(&self) -> u32 {
