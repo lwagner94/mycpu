@@ -2,7 +2,7 @@ extern crate mycpu;
 
 use std::env;
 
-use mycpu::assembler::assembler::assemble_file;
+use mycpu::assembler::codegen::assemble_file;
 
 
 fn main() {

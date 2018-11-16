@@ -1,6 +1,6 @@
 use crate::emulator::memory::*;
 
-
+#[derive(Default)]
 pub struct ConsoleIO {
 }
 
@@ -43,12 +43,5 @@ impl Memory for ConsoleIO {
 
     fn size(&self) -> u32 {
         8
-    }
-}
-
-impl ConsoleIO {
-    pub fn new() -> Self {
-        ConsoleIO {
-        }
     }
 }

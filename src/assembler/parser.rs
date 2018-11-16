@@ -84,8 +84,8 @@ pub fn parse_operand(s: &str) -> Option<Op> {
 
 
 pub fn parse_label(token: &TokenizedLine) -> Option<ParsedLine> {
-    if token.tokens.len() == 1 && token.tokens[0].token.ends_with(":") {
-        let label = token.tokens[0].token.replace(":", "");
+    if token.tokens.len() == 1 && token.tokens[0].token.ends_with(':') {
+        let label = token.tokens[0].token.replace(':', "");
         Some(ParsedLine::Label(label))
     }
     else {

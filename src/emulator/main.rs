@@ -5,7 +5,7 @@ use std::time::SystemTime;
 
 use mycpu::emulator::cpu::CPU;
 use mycpu::emulator::memory::{AddressSpace, Memory};
-use mycpu::assembler::assembler::assemble_file;
+use mycpu::assembler::codegen::assemble_file;
 
 
 fn main() {
@@ -14,7 +14,7 @@ fn main() {
 
     let mut memory = AddressSpace::default();
 
-    memory.write_all(bytes.as_slice(), 0x100000);
+    memory.write_all(bytes.as_slice(), 0x10_0000);
 
     let mut cpu = CPU::new(memory);
     let before = SystemTime::now();

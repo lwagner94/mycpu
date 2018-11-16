@@ -26,13 +26,13 @@ impl DecodedInstruction {
         DecodedInstruction::new(Instruction::Invalid, 0, 0, 0, 0)
     }
 
-    pub fn decode(instruction: &[u8; 8]) -> Self {
+    pub fn decode(instruction: [u8; 8]) -> Self {
         let instruction_type = Instruction::from(instruction[0]);
         
-        let b0 = instruction[4] as u32;
-        let b1 = instruction[5] as u32;
-        let b2 = instruction[6] as u32;
-        let b3 = instruction[7] as u32;
+        let b0 = u32::from(instruction[4]);
+        let b1 = u32::from(instruction[5]);
+        let b2 = u32::from(instruction[6]);
+        let b3 = u32::from(instruction[7]);
 
         let operand = b0 << 24 | b1 << 16 | b2 << 8 | b3;
 

@@ -40,8 +40,8 @@ pub fn assemble_file(path: &str) -> Option<Vec<u8>> {
         match instr {
             ParsedLine::Instruction(dec) => {
                 let a: u32 = match &dec.op {
-                    Op::Label(name) => lookup.get(&name)?.clone(),
-                    Op::Number(number) => number.clone()
+                    Op::Label(name) => *(lookup.get(&name)?),
+                    Op::Number(number) => *number
                 };
 
                 let instr = DecodedInstruction::new(dec.instruction.clone(),

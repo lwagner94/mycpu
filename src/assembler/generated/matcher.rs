@@ -2,8 +2,9 @@ use crate::common::generated::instruction::Instruction;
 use crate::assembler::tokenizer::TokenizedLine;
 use crate::assembler::parser::{*};
 
+#[allow(clippy::cyclomatic_complexity)]
 pub fn match_instruction(line: &TokenizedLine) -> Option<ParsedLine> {
-    if line.tokens.len() == 0 {
+    if line.tokens.is_empty() {
         return None;
     }
     let instruction_identifier = line.tokens[0].token.as_str();

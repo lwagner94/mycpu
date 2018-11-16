@@ -102,9 +102,9 @@ impl CPU {
 
         while !self.halt {
             let instruction = self.load_instruction();
-            let decoded_instruction = DecodedInstruction::decode(&instruction);
+            let decoded_instruction = DecodedInstruction::decode(instruction);
             self.cycle_counter += 1;
-            self.execute_instruction(decoded_instruction);
+            self.execute_instruction(&decoded_instruction);
         }
     }
 
@@ -112,12 +112,11 @@ impl CPU {
         let pc = self.regs[Register::PC as usize].0;
         self.regs[Register::PC as usize] += Wrapping(8);
 
-        let buffer = self.memory.read_instruction(pc);
+        self.memory.read_instruction(pc)
 
-        buffer
     }
 
-    fn execute_instruction(self: &mut Self, d: DecodedInstruction) {
+    fn execute_instruction(self: &mut Self, d: &DecodedInstruction) {
 
         let reg_1 = d.reg_1 as usize;
         let reg_2 = d.reg_2 as usize;
@@ -147,12 +146,12 @@ impl CPU {
             And => self.regs[reg_1] = self.regs[reg_2] & self.regs[reg_3],
             Or => self.regs[reg_1] = self.regs[reg_2] | self.regs[reg_3],
             XOr => self.regs[reg_1] = self.regs[reg_2] ^ self.regs[reg_3],
-            Negate => self.regs[reg_1] = Wrapping((-(self.regs[reg_1].0 as i64)) as u32),
+            Negate => self.regs[reg_1] = Wrapping((-i64::from(self.regs[reg_1].0)) as u32),
             Complement => self.regs[reg_1] = !self.regs[reg_1],
 
             LoadImmediate => self.regs[reg_1] = Wrapping(d.operand),
             Load => self.regs[reg_1] = Wrapping(self.memory.read_doubleword(d.operand)),
-            LoadByte => self.regs[reg_1] = Wrapping(self.memory.read(d.operand) as u32),
+            LoadByte => self.regs[reg_1] = Wrapping(u32::from(self.memory.read(d.operand))),
             Store => self.memory.write_doubleword(d.operand, self.regs[reg_1].0),
             StoreByte => self.memory.write(d.operand, self.regs[reg_1].0 as u8),
             Push => self.push(reg_1),
@@ -241,7 +240,7 @@ mod tests {
     #[test]
     fn test_load_immediate() {
         let mut cpu = create_cpu();
-        cpu.execute_instruction(DecodedInstruction::new(
+        cpu.execute_instruction(&DecodedInstruction::new(
             LoadImmediate, 0, 0, 0, 1337));
         assert_eq!(cpu.get_register(R0), 1337);
     }
@@ -249,7 +248,7 @@ mod tests {
     #[test]
     fn test_increment() {
         let mut cpu = cpu_arith_prep();
-        cpu.execute_instruction(DecodedInstruction::new(
+        cpu.execute_instruction(&DecodedInstruction::new(
             Increment, 1, 0,0,0));
         assert_eq!(cpu.get_register(R1), 11);
     }
@@ -257,7 +256,7 @@ mod tests {
     #[test]
     fn test_decrement() {
         let mut cpu = cpu_arith_prep();
-        cpu.execute_instruction(DecodedInstruction::new(
+        cpu.execute_instruction(&DecodedInstruction::new(
             Decrement, 1, 0,0,0));
         assert_eq!(cpu.get_register(R1), 9);
     }
@@ -265,7 +264,7 @@ mod tests {
     #[test]
     fn test_add() {
         let mut cpu = cpu_arith_prep();
-        cpu.execute_instruction(DecodedInstruction::new(
+        cpu.execute_instruction(&DecodedInstruction::new(
             Add, 0, 1,2,0));
         assert_eq!(cpu.get_register(R0), 15);
     }
@@ -273,7 +272,7 @@ mod tests {
     #[test]
     fn test_subtract() {
         let mut cpu = cpu_arith_prep();
-        cpu.execute_instruction(DecodedInstruction::new(
+        cpu.execute_instruction(&DecodedInstruction::new(
             Subtract, 0, 1,2,0));
         assert_eq!(cpu.get_register(R0), 5);
     }
@@ -281,7 +280,7 @@ mod tests {
     #[test]
     fn test_multiply() {
         let mut cpu = cpu_arith_prep();
-        cpu.execute_instruction(DecodedInstruction::new(
+        cpu.execute_instruction(&DecodedInstruction::new(
             Multiply, 0, 1,2,0));
         assert_eq!(cpu.get_register(R0), 50);
     }
@@ -289,7 +288,7 @@ mod tests {
     #[test]
     fn test_divide() {
         let mut cpu = cpu_arith_prep();
-        cpu.execute_instruction(DecodedInstruction::new(
+        cpu.execute_instruction(&DecodedInstruction::new(
             Divide, 0, 1,2,0));
         assert_eq!(cpu.get_register(R0), 2);
     }
@@ -297,7 +296,7 @@ mod tests {
     #[test]
     fn test_or() {
         let mut cpu = cpu_binary_prep();
-        cpu.execute_instruction(DecodedInstruction::new(
+        cpu.execute_instruction(&DecodedInstruction::new(
             Or, 0, 1,2,0));
         assert_eq!(cpu.get_register(R0), 0b1111);
     }
@@ -305,7 +304,7 @@ mod tests {
     #[test]
     fn test_and() {
         let mut cpu = cpu_binary_prep();
-        cpu.execute_instruction(DecodedInstruction::new(
+        cpu.execute_instruction(&DecodedInstruction::new(
             And, 0, 1,2,0));
         assert_eq!(cpu.get_register(R0), 0b1000);
     }
@@ -313,7 +312,7 @@ mod tests {
     #[test]
     fn test_xor() {
         let mut cpu = cpu_binary_prep();
-        cpu.execute_instruction(DecodedInstruction::new(
+        cpu.execute_instruction(&DecodedInstruction::new(
             XOr, 0, 1,2,0));
         assert_eq!(cpu.get_register(R0), 0b0111);
     }
@@ -322,7 +321,7 @@ mod tests {
     fn test_negate() {
         let mut cpu = create_cpu();
         cpu.set_register(R0, 0b00000000_00000001);
-        cpu.execute_instruction(DecodedInstruction::new(
+        cpu.execute_instruction(&DecodedInstruction::new(
             Negate, 0, 0,0,0));
         assert_eq!(cpu.get_register(R0), 0b11111111_11111111_11111111_11111111);
     }
@@ -331,7 +330,7 @@ mod tests {
     fn test_complement() {
         let mut cpu = create_cpu();
         cpu.set_register(R0, 0b00000000_00000001);
-        cpu.execute_instruction(DecodedInstruction::new(
+        cpu.execute_instruction(&DecodedInstruction::new(
             Complement, 0, 0,0,0));
         assert_eq!(cpu.get_register(R0), 0b11111111_11111111_11111111_11111110);
     }
@@ -341,7 +340,7 @@ mod tests {
         let mut cpu = create_cpu();
         cpu.set_register(R0, 10);
         cpu.set_register(R1, 10);
-        cpu.execute_instruction(DecodedInstruction::new(
+        cpu.execute_instruction(&DecodedInstruction::new(
             Compare, 0, 1, 0, 0));
         assert!(cpu.get_status_bit(StatusBit::Zero));
         assert!(!cpu.get_status_bit(StatusBit::Carry));
@@ -353,7 +352,7 @@ mod tests {
         let mut cpu = create_cpu();
         cpu.set_register(R0, 10);
         cpu.set_register(R1, 11);
-        cpu.execute_instruction(DecodedInstruction::new(
+        cpu.execute_instruction(&DecodedInstruction::new(
             Compare, 0, 1, 0, 0));
         assert!(!cpu.get_status_bit(StatusBit::Zero));
         assert!(cpu.get_status_bit(StatusBit::Carry));
@@ -365,7 +364,7 @@ mod tests {
         let mut cpu = create_cpu();
         cpu.set_register(R0, 0xfffffff6); // -10
         cpu.set_register(R1, 11);
-        cpu.execute_instruction(DecodedInstruction::new(
+        cpu.execute_instruction(&DecodedInstruction::new(
             Compare, 0, 1, 0, 0));
         assert!(!cpu.get_status_bit(StatusBit::Zero));
         assert!(!cpu.get_status_bit(StatusBit::Carry));
@@ -387,11 +386,11 @@ mod tests {
     #[test]
     fn test_branch_equal() {
         let mut cpu = create_cpu();
-        cpu.execute_instruction(DecodedInstruction::new(
+        cpu.execute_instruction(&DecodedInstruction::new(
             BranchEqual, 0, 0, 0, 0xCAFEBABE));
         assert_ne!(cpu.get_register(Register::PC), 0xCAFEBABE);
         cpu.set_status_bit(StatusBit::Zero, true);
-        cpu.execute_instruction(DecodedInstruction::new(
+        cpu.execute_instruction(&DecodedInstruction::new(
             BranchEqual, 0, 0, 0, 0xCAFEBABE));
 
         assert_eq!(cpu.get_register(Register::PC), 0xCAFEBABE);
@@ -401,13 +400,13 @@ mod tests {
     fn test_branch_not_equal() {
         let mut cpu = create_cpu();
         cpu.set_status_bit(StatusBit::Zero, true);
-        cpu.execute_instruction(DecodedInstruction::new(
+        cpu.execute_instruction(&DecodedInstruction::new(
             BranchNotEqual, 0, 0, 0, 0xCAFEBABE));
 
         assert_ne!(cpu.get_register(Register::PC), 0xCAFEBABE);
 
         cpu.set_status_bit(StatusBit::Zero, false);
-        cpu.execute_instruction(DecodedInstruction::new(
+        cpu.execute_instruction(&DecodedInstruction::new(
             BranchNotEqual, 0, 0, 0, 0xCAFEBABE));
         assert_eq!(cpu.get_register(Register::PC), 0xCAFEBABE);
     }

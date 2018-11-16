@@ -28,10 +28,10 @@ pub fn address_to_index(addr: u32) -> usize {
 
 pub fn read_doubleword<F>(read_func: F, addr: u32) -> u32 where F: Fn(u32) -> u8 {
     check_alignment(addr, 4);
-    let b0 = read_func(addr) as u32;
-    let b1 = read_func(addr + 1) as u32;
-    let b2 = read_func(addr + 2) as u32;
-    let b3 = read_func(addr + 3) as u32;
+    let b0 = u32::from(read_func(addr));
+    let b1 = u32::from(read_func(addr + 1));
+    let b2 = u32::from(read_func(addr + 2));
+    let b3 = u32::from(read_func(addr + 3));
 
     b0 << 24 | b1 << 16 | b2 << 8 | b3
 }
@@ -42,7 +42,7 @@ pub fn write_doubleword<F>(mut write_func: F, addr: u32, value: u32) where F: Fn
     write_func(addr, ((0xFF_00_00_00 & value) >> 24) as u8);
     write_func(addr + 1, ((0x00_FF_00_00 & value) >> 16) as u8);
     write_func(addr + 2, ((0x00_00_FF_00 & value) >> 8) as u8);
-    write_func(addr + 3, ((0x00_00_00_FF & value) >> 0) as u8);
+    write_func(addr + 3, (0x00_00_00_FF & value) as u8);
 }
 
 struct MappedDevice {
@@ -95,19 +95,15 @@ impl Memory for AddressSpace {
 
     fn size(&self) -> u32 {
         // 4 Gigabyte
-        0xFFFFFFFF
+        0xFFFF_FFFF
     }
 }
 
-impl AddressSpace {
-    pub fn new() -> Self {
-        AddressSpace{
+impl Default for AddressSpace {
+    fn default() -> Self {
+        let mut mem = AddressSpace{
             devices: Vec::new()
-        }
-    }
-
-    pub fn default() -> Self {
-        let mut mem = AddressSpace::new();
+        };
 
         let main_memory = Box::new(MainMemory::new(1024 * 1024));
 
@@ -116,7 +112,7 @@ impl AddressSpace {
         mem.map(main_memory, MEMORY_START);
 
         // ConsoleIO: 8 bytes
-        let console_io = Box::new(ConsoleIO::new());
+        let console_io = Box::new(ConsoleIO::default());
 
         // Map at 512kByte
         // Map it at 0x80000 - 0x80007
@@ -124,7 +120,9 @@ impl AddressSpace {
 
         mem
     }
+}
 
+impl AddressSpace {
     pub fn map(&mut self, device: Box<Memory>, offset: u32) {
         let size = device.size();
 

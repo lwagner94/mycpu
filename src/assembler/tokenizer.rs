@@ -26,7 +26,7 @@ fn strip_comments(line: String) -> String {
     }
 }
 
-fn trim(line: String) -> String {
+fn trim(line: &str) -> String {
     line.trim().into()
 }
 
@@ -61,7 +61,7 @@ pub fn tokenize(reader: &mut BufRead) -> Vec<TokenizedLine> {
     let mut tokenized_lines = Vec::new();
 
     for line in lines {
-        let text = trim(strip_comments(line.text.clone()));
+        let text = trim(&strip_comments(line.text.clone()));
         if text.is_empty() {
             continue;
         }
