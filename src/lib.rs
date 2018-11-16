@@ -1,5 +1,3 @@
-#![allow(dead_code,unused_variables)]
-
 extern crate byteorder;
 
 pub mod emulator;

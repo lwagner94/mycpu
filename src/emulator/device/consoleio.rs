@@ -5,12 +5,12 @@ pub struct ConsoleIO {
 }
 
 impl Memory for ConsoleIO {
-    fn read(&self, addr: u32) -> u8 {
-        0
+    fn read(&self, _addr: u32) -> u8 {
+        unimplemented!();
     }
 
-    fn read_doubleword(&self, addr: u32) -> u32 {
-        0
+    fn read_doubleword(&self, _addr: u32) -> u32 {
+        unimplemented!();
     }
 
     fn read_all(&self, addr: u32, number: u32) -> Vec<u8> {
@@ -32,11 +32,11 @@ impl Memory for ConsoleIO {
         self.write(addr, byte);
     }
 
-    fn write_all(&mut self, bytes: &[u8], offset: u32) {
+    fn write_all(&mut self, _bytes: &[u8], _offset: u32) {
         unimplemented!();
     }
 
-    fn read_instruction(&self, addr: u32) -> [u8; 8] {
+    fn read_instruction(&self, _addr: u32) -> [u8; 8] {
         unimplemented!()
     }
 

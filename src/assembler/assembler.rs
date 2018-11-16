@@ -24,7 +24,7 @@ pub fn assemble_file(path: &str) -> Option<Vec<u8>> {
     // Build lookup table
     for instr in &parsed {
         match instr {
-            ParsedLine::Instruction(dec) => counter += 8,
+            ParsedLine::Instruction(_dec) => counter += 8,
             ParsedLine::Label(name) => {
                 if lookup.insert(name, counter).is_some() {
                     return None
@@ -52,7 +52,7 @@ pub fn assemble_file(path: &str) -> Option<Vec<u8>> {
 
                 bytes.write(&instr.encode()).ok()?;
             }
-            ParsedLine::Label(name) => {}
+            ParsedLine::Label(_name) => {}
         };
     }
 

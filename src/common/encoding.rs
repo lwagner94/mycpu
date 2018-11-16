@@ -1,5 +1,4 @@
-use byteorder::{BigEndian, WriteBytesExt, ReadBytesExt};
-use std::io::Cursor;
+use byteorder::{BigEndian, WriteBytesExt};
 
 use super::super::common::generated::instruction::Instruction;
 

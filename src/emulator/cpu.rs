@@ -42,7 +42,6 @@ pub struct CPU {
     pub regs: [Wrapping<u32>; 19],
     pub memory: AddressSpace,
     halt: bool,
-    instruction: DecodedInstruction,
     pub cycle_counter: u64
 }
 
@@ -55,7 +54,6 @@ impl CPU {
             regs: [Wrapping(0u32); 19],
             memory,
             halt: false,
-            instruction: DecodedInstruction::invalid(),
             cycle_counter: 0
         };
 
@@ -89,6 +87,7 @@ impl CPU {
         self.regs[reg as usize].0
     }
 
+    #[allow(unused)]
     fn set_register(self: &mut Self, reg: Register, value: u32) {
         self.regs[reg as usize] = Wrapping(value);
     }
@@ -193,7 +192,7 @@ impl CPU {
     }
 
     fn return_from_call(&mut self) {
-        let pc = self.pop(Register::PC as usize);
+        self.pop(Register::PC as usize);
     }
 
     fn halt(self: &mut Self) {
