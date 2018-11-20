@@ -45,10 +45,12 @@ where
 {
     check_alignment(addr, 4);
 
-    write_func(addr, ((0xFF_00_00_00 & value) >> 24) as u8);
-    write_func(addr + 1, ((0x00_FF_00_00 & value) >> 16) as u8);
-    write_func(addr + 2, ((0x00_00_FF_00 & value) >> 8) as u8);
-    write_func(addr + 3, (0x00_00_00_FF & value) as u8);
+    let bytes = util::u32_to_bytes(value);
+
+    write_func(addr, bytes[0]);
+    write_func(addr + 1, bytes[1]);
+    write_func(addr + 2, bytes[2]);
+    write_func(addr + 3, bytes[3]);
 }
 
 pub struct AddressSpace {
@@ -101,29 +103,25 @@ impl Default for AddressSpace {
     fn default() -> Self {
         AddressSpace {
             memory: MainMemory::new(MEMORY_START, MEMORY_SIZE),
-            console: ConsoleIO::new(CONSOLEIO_START)
+            console: ConsoleIO::new(CONSOLEIO_START),
         }
     }
 }
 
 impl AddressSpace {
     fn device_for_address(&self, addr: u32) -> &Memory {
-
         match addr {
             MEMORY_START...MEMORY_END => &self.memory,
             CONSOLEIO_START...CONSOLEIO_END => &self.console,
-            _ => panic!("Invalid memory access add 0x{:X}")
+            _ => panic!("Invalid memory access add 0x{:X}", addr),
         }
-
     }
 
     fn device_for_address_mut(&mut self, addr: u32) -> &mut Memory {
-
         match addr {
             MEMORY_START...MEMORY_END => &mut self.memory,
             CONSOLEIO_START...CONSOLEIO_END => &mut self.console,
-            _ => panic!("Invalid memory access add 0x{:X}")
+            _ => panic!("Invalid memory access add 0x{:X}", addr),
         }
-
     }
 }

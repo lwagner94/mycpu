@@ -14,4 +14,3 @@ name = "emulator"
 path = "src/emulator/main.rs"
 
 [dependencies]
-byteorder = "1.2.7"

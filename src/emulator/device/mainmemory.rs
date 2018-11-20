@@ -4,7 +4,7 @@ use crate::emulator::memory::{
 
 pub struct MainMemory {
     data: Vec<u8>,
-    offset: u32
+    offset: u32,
 }
 
 impl Memory for MainMemory {
@@ -65,14 +65,14 @@ mod tests {
 
     #[test]
     fn test_write() {
-        let mut mem = MainMemory::new(0,8);
+        let mut mem = MainMemory::new(0, 8);
         mem.write(7, 10);
         assert_eq!(mem.data, [0, 0, 0, 0, 0, 0, 0, 10]);
     }
 
     #[test]
     fn test_write_doubleword() {
-        let mut mem = MainMemory::new(0,8);
+        let mut mem = MainMemory::new(0, 8);
         mem.write_doubleword(4, 0xAABBCCDD);
         assert_eq!(mem.data, [0, 0, 0, 0, 0xAA, 0xBB, 0xCC, 0xDD]);
     }

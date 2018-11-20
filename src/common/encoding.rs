@@ -1,5 +1,3 @@
-use byteorder::{BigEndian, WriteBytesExt};
-
 use crate::common::generated::instruction::Instruction;
 use crate::common::util;
 
@@ -48,14 +46,12 @@ impl DecodedInstruction {
                 instruction[7],
             ),
         )
-
     }
 
     pub fn encode(self) -> [u8; 8] {
         let t: u8 = self.instruction_type.into();
 
-        let mut operand_bytes = Vec::new();
-        operand_bytes.write_u32::<BigEndian>(self.operand).unwrap();
+        let operand_bytes = util::u32_to_bytes(self.operand);
 
         [
             t,
@@ -67,15 +63,5 @@ impl DecodedInstruction {
             operand_bytes[2],
             operand_bytes[3],
         ]
-    }
-}
-
-#[cfg(test)]
-mod tests {
-    //use super::*;
-
-    #[test]
-    fn test_encode() {
-        assert_eq!(1, 1);
     }
 }

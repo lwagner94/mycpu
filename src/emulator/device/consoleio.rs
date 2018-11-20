@@ -47,8 +47,6 @@ impl Memory for ConsoleIO {
 
 impl ConsoleIO {
     pub fn new(offset: u32) -> Self {
-        ConsoleIO {
-            offset
-        }
+        ConsoleIO { offset }
     }
 }
