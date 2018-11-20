@@ -71,6 +71,18 @@ pub fn match_instruction(line: &TokenizedLine) -> Option<ParsedLine> {
             0,
             0,
             parse_operand(line.tokens[2].token.as_str())?), 
+        "addi" if line.tokens.len() == 3 => MatchedInstruction::new(
+            Instruction::AddImmediate,
+            parse_register_name(line.tokens[1].token.as_str())?,
+            0,
+            0,
+            parse_operand(line.tokens[2].token.as_str())?), 
+        "subi" if line.tokens.len() == 3 => MatchedInstruction::new(
+            Instruction::SubtractImmediate,
+            parse_register_name(line.tokens[1].token.as_str())?,
+            0,
+            0,
+            parse_operand(line.tokens[2].token.as_str())?), 
         "or" if line.tokens.len() == 4 => MatchedInstruction::new(
             Instruction::Or,
             parse_register_name(line.tokens[1].token.as_str())?,

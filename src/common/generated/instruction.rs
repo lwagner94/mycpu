@@ -15,6 +15,8 @@ pub enum Instruction {
     Divide,
     Compare,
     CompareImmediate,
+    AddImmediate,
+    SubtractImmediate,
     Or,
     And,
     XOr,

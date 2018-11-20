@@ -138,6 +138,9 @@ impl CPU {
                 self.compare(l, r);
             }
 
+            AddImmediate => self.regs[reg_1] = self.regs[reg_2] + Wrapping(d.operand),
+            SubtractImmediate => self.regs[reg_1] = self.regs[reg_2] - Wrapping(d.operand),
+
             And => self.regs[reg_1] = self.regs[reg_2] & self.regs[reg_3],
             Or => self.regs[reg_1] = self.regs[reg_2] | self.regs[reg_3],
             XOr => self.regs[reg_1] = self.regs[reg_2] ^ self.regs[reg_3],

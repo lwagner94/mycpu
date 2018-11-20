@@ -58,6 +58,18 @@
   regs: 1
   op: 1
 
+- name: AddImmediate
+  code: 0x18
+  keyword: addi
+  regs: 1
+  op: 1
+
+- name: SubtractImmediate
+  code: 0x19
+  keyword: subi
+  regs: 1
+  op: 1
+
 - name: Or
   code: 0x20
   keyword: or
