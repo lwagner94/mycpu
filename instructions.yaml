@@ -97,36 +97,59 @@
 - name: Load
   code: 0x31
   keyword: ld
-  regs: 1
-  op: 1
+  regs: 2
+  op: 0
 
 - name: LoadByte
   code: 0x32
   keyword: ldb
+  regs: 2
+  op: 0
+
+- name: LoadDirect
+  code: 0x33
+  keyword: ldd
+  regs: 1
+  op: 1
+
+- name: LoadDirectByte
+  code: 0x34
+  keyword: lddb
   regs: 1
   op: 1
 
 - name: Store
-  code: 0x33
+  code: 0x35
   keyword: st
-  regs: 1
-  op: 1
+  regs: 2
+  op: 0
 
 - name: StoreByte
-  code: 0x34
+  code: 0x36
   keyword: stb
+  regs: 2
+  op: 0
+
+- name: StoreDirect
+  code: 0x37
+  keyword: std
   regs: 1
   op: 1
 
+- name: StoreDirectByte
+  code: 0x38
+  keyword: stdb
+  regs: 1
+  op: 1
 
 - name: Push
-  code: 0x35
+  code: 0x39
   keyword: push
   regs: 1
   op: 0
 
 - name: Pop
-  code: 0x36
+  code: 0x3A
   keyword: pop
   regs: 1
   op: 0

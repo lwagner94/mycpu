@@ -1,4 +1,4 @@
-ldi sp, 0x1ffffc // Setup stack
+ldi sp, MEMORY_END // Setup stack
 
 ldi r0, 10000000
 

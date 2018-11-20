@@ -110,11 +110,23 @@ pub fn match_instruction(line: &TokenizedLine) -> Option<ParsedLine> {
         "ld" if line.tokens.len() == 3 => MatchedInstruction::new(
             Instruction::Load,
             parse_register_name(line.tokens[1].token.as_str())?,
+            parse_register_name(line.tokens[2].token.as_str())?,
+            0,
+            Op::Number(0)), 
+        "ldb" if line.tokens.len() == 3 => MatchedInstruction::new(
+            Instruction::LoadByte,
+            parse_register_name(line.tokens[1].token.as_str())?,
+            parse_register_name(line.tokens[2].token.as_str())?,
+            0,
+            Op::Number(0)), 
+        "ldd" if line.tokens.len() == 3 => MatchedInstruction::new(
+            Instruction::LoadDirect,
+            parse_register_name(line.tokens[1].token.as_str())?,
             0,
             0,
             parse_operand(line.tokens[2].token.as_str())?), 
-        "ldb" if line.tokens.len() == 3 => MatchedInstruction::new(
-            Instruction::LoadByte,
+        "lddb" if line.tokens.len() == 3 => MatchedInstruction::new(
+            Instruction::LoadDirectByte,
             parse_register_name(line.tokens[1].token.as_str())?,
             0,
             0,
@@ -122,11 +134,23 @@ pub fn match_instruction(line: &TokenizedLine) -> Option<ParsedLine> {
         "st" if line.tokens.len() == 3 => MatchedInstruction::new(
             Instruction::Store,
             parse_register_name(line.tokens[1].token.as_str())?,
+            parse_register_name(line.tokens[2].token.as_str())?,
+            0,
+            Op::Number(0)), 
+        "stb" if line.tokens.len() == 3 => MatchedInstruction::new(
+            Instruction::StoreByte,
+            parse_register_name(line.tokens[1].token.as_str())?,
+            parse_register_name(line.tokens[2].token.as_str())?,
+            0,
+            Op::Number(0)), 
+        "std" if line.tokens.len() == 3 => MatchedInstruction::new(
+            Instruction::StoreDirect,
+            parse_register_name(line.tokens[1].token.as_str())?,
             0,
             0,
             parse_operand(line.tokens[2].token.as_str())?), 
-        "stb" if line.tokens.len() == 3 => MatchedInstruction::new(
-            Instruction::StoreByte,
+        "stdb" if line.tokens.len() == 3 => MatchedInstruction::new(
+            Instruction::StoreDirectByte,
             parse_register_name(line.tokens[1].token.as_str())?,
             0,
             0,

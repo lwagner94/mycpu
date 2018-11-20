@@ -145,10 +145,20 @@ impl CPU {
             Complement => self.regs[reg_1] = !self.regs[reg_1],
 
             LoadImmediate => self.regs[reg_1] = Wrapping(d.operand),
-            Load => self.regs[reg_1] = Wrapping(self.memory.read_doubleword(d.operand)),
-            LoadByte => self.regs[reg_1] = Wrapping(u32::from(self.memory.read(d.operand))),
-            Store => self.memory.write_doubleword(d.operand, self.regs[reg_1].0),
-            StoreByte => self.memory.write(d.operand, self.regs[reg_1].0 as u8),
+            Load => self.regs[reg_1] = Wrapping(self.memory.read_doubleword(self.regs[reg_2].0)),
+            LoadByte => {
+                self.regs[reg_1] = Wrapping(u32::from(self.memory.read(self.regs[reg_2].0)))
+            }
+            LoadDirect => self.regs[reg_1] = Wrapping(self.memory.read_doubleword(d.operand)),
+            LoadDirectByte => self.regs[reg_1] = Wrapping(u32::from(self.memory.read(d.operand))),
+            Store => self
+                .memory
+                .write_doubleword(self.regs[reg_2].0, self.regs[reg_1].0),
+            StoreByte => self
+                .memory
+                .write(self.regs[reg_2].0, self.regs[reg_1].0 as u8),
+            StoreDirect => self.memory.write_doubleword(d.operand, self.regs[reg_1].0),
+            StoreDirectByte => self.memory.write(d.operand, self.regs[reg_1].0 as u8),
             Push => self.push(reg_1),
             Pop => self.pop(reg_1),
 

@@ -9,7 +9,7 @@ ldi r1, 65 // A in decimal
 loop:
 cmpi r0, 26
 breq end
-stb r1, CONSOLEIO_START // Mapped ConsoleIO device
+stdb r1, CONSOLEIO_START // Mapped ConsoleIO device
 inc r1
 inc r0
 jmp loop
