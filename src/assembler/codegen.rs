@@ -23,12 +23,17 @@ pub fn assemble_file(path: &str) -> Option<Vec<u8>> {
         match instr {
             ParsedLine::Instruction(_dec) => counter += 8,
             ParsedLine::Label(name) => {
-                if lookup.insert(name, counter).is_some() {
+                if lookup.insert(name.clone(), counter).is_some() {
                     return None;
                 }
             }
         }
     }
+
+    lookup.insert(String::from("PROGRAM_START"), MEMORY_START);
+    lookup.insert(String::from("PROGRAM_END"), counter);
+    lookup.insert(String::from("MEMORY_END"), align_down(MEMORY_END));
+    lookup.insert(String::from("CONSOLEIO_START"), CONSOLEIO_START);
 
     let mut bytes = Vec::new();
 
@@ -36,7 +41,7 @@ pub fn assemble_file(path: &str) -> Option<Vec<u8>> {
         match instr {
             ParsedLine::Instruction(dec) => {
                 let a: u32 = match &dec.op {
-                    Op::Label(name) => *(lookup.get(&name)?),
+                    Op::Label(name) => *(lookup.get(name)?),
                     Op::Number(number) => *number,
                 };
 
@@ -55,4 +60,43 @@ pub fn assemble_file(path: &str) -> Option<Vec<u8>> {
     }
 
     Some(bytes)
+}
+
+#[allow(unused)]
+fn align_up(addr: u32) -> u32 {
+    let remainder = addr % 4;
+    if remainder != 0 {
+        addr + (4 - remainder)
+    } else {
+        addr
+    }
+}
+
+fn align_down(addr: u32) -> u32 {
+    addr - addr % 4
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_align_unchanged() {
+        let aligned = 16u32;
+        assert_eq!(aligned, align_up(aligned));
+        assert_eq!(aligned, align_down(aligned));
+    }
+
+    #[test]
+    fn test_align_up() {
+        let n = 17u32;
+        assert_eq!(20, align_up(n));
+    }
+
+    #[test]
+    fn test_align_down() {
+        let n = 17u32;
+        assert_eq!(16, align_down(n));
+    }
+
 }
