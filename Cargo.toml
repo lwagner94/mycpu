@@ -13,4 +13,9 @@ path = "src/assembler/main.rs"
 name = "emulator"
 path = "src/emulator/main.rs"
 
+[[bin]]
+name = "bf2asm"
+path = "src/bf2asm/main.rs"
+
+
 [dependencies]

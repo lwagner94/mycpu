@@ -61,13 +61,13 @@
 - name: AddImmediate
   code: 0x18
   keyword: addi
-  regs: 1
+  regs: 2
   op: 1
 
 - name: SubtractImmediate
   code: 0x19
   keyword: subi
-  regs: 1
+  regs: 2
   op: 1
 
 - name: Or

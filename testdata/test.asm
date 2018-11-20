@@ -1,6 +1,6 @@
 ldi sp, MEMORY_END // Setup stack
 
-ldi r0, CONSOLEIO_START
-ldi r1, 65
-stb r1, r0
+ldi r0, 10
+subi r0, r0, 1
+
 halt
